@@ -1,0 +1,42 @@
+# Credentials and local environment
+账号.txt
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+
+# IDE and operating-system files
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Java / Maven build output
+**/target/
+
+# Node.js dependencies and generated output
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+**/test-results/
+**/playwright-report/
+
+# Local runtime data and uploads
+**/uploads/
+
+# Temporary validation artifacts
+site-mvp/tmp-*.json
+site-mvp/frontend/build-output.txt
+site-mvp/frontend/target-hero-status.txt
+site-mvp/frontend/target-top-assets.json
+site-mvp/frontend/local-*.png
+site-mvp/frontend/target-*.png
+site-mvp/frontend/direct-banner-asset.png
+
+# Local planning/reference materials (not application source)
+独立站开发手册/

@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: site-backend
+  profiles:
+    active: dev
+
+site:
+  base-url: http://localhost:5173
+  auth:
+    initial-admin-username: ${SITE_ADMIN_USERNAME:}
+    initial-admin-password-hash: ${SITE_ADMIN_PASSWORD_HASH:}
+    initial-operator-username: ${SITE_OPERATOR_USERNAME:}
+    initial-operator-password-hash: ${SITE_OPERATOR_PASSWORD_HASH:}

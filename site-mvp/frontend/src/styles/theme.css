@@ -1,0 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap");
+
+:root {
+  --pf-blue: #0f4aa1;
+  --pf-blue-deep: #0b2f6d;
+  --pf-cyan: #2aa8e0;
+  --pf-ink: #18314f;
+  --pf-muted: #60758f;
+  --pf-line: #dce6f2;
+  --pf-bg: #f4f8fc;
+  --pf-surface: #ffffff;
+  --pf-footer: #132843;
+  --pf-footer-ink: #ccdbef;
+      /* Measured from the target site: 1260px standard desktop container. */
+      --site-width: 1260px;
+    --site-gutter: 40px;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --shadow-soft: 0 14px 34px rgba(13, 61, 132, 0.12);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* The target switches to a wider 1680px container on large desktop screens. */
+@media (min-width: 1600px) {
+  :root {
+    --site-width: 1680px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Barlow", "Noto Sans SC", sans-serif;
+  background:
+    radial-gradient(circle at 10% -10%, rgba(79, 169, 255, 0.18), transparent 30%),
+    radial-gradient(circle at 92% 2%, rgba(20, 100, 200, 0.12), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0)),
+    var(--pf-bg);
+  color: var(--pf-ink);
+}
+
+a {
+  color: inherit;
+}
+
+.section-title {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.3vw, 2.15rem);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.section-subtitle {
+  margin: 10px 0 0;
+  color: var(--pf-muted);
+  max-width: 780px;
+}
+
+.eyebrow-chip {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+}

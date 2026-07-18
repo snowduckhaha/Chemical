@@ -1,0 +1,27 @@
+{
+  "name": "qidian-site-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "validate:public-content": "node ./scripts/validate-public-content.mjs",
+    "capture:banner": "node ./scripts/capture-banner-ready.mjs",
+    "capture:target-hero": "node ./scripts/diagnose-banner.mjs capture-target-hero"
+  },
+  "dependencies": {
+    "element-plus": "^2.8.4",
+    "pinia": "^2.1.7",
+    "qidian-site-frontend": "file:",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "playwright": "^1.61.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}
