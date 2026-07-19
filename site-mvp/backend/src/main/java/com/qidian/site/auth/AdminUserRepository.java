@@ -45,4 +45,12 @@ public class AdminUserRepository {
     public void updateLastLogin(String username) {
         jdbcTemplate.update("UPDATE admin_user SET last_login_at = CURRENT_TIMESTAMP WHERE username = ?", username);
     }
+
+    public void updatePassword(String username, String passwordHash) {
+        jdbcTemplate.update("""
+            UPDATE admin_user
+            SET password_hash = ?, must_change_password = FALSE
+            WHERE username = ?
+            """, passwordHash, username);
+    }
 }

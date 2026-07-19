@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,11 +30,17 @@ public class AdminAuthController {
 
     private final AuthenticationManager authenticationManager;
     private final AdminUserRepository adminUserRepository;
+    private final PasswordEncoder passwordEncoder;
     private final HttpSessionSecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
-    public AdminAuthController(AuthenticationManager authenticationManager, AdminUserRepository adminUserRepository) {
+    public AdminAuthController(
+        AuthenticationManager authenticationManager,
+        AdminUserRepository adminUserRepository,
+        PasswordEncoder passwordEncoder
+    ) {
         this.authenticationManager = authenticationManager;
         this.adminUserRepository = adminUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
@@ -77,6 +85,26 @@ public class AdminAuthController {
         return ApiResponse.ok(currentUser(authentication));
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> changePassword(
+        @Valid @RequestBody ChangePasswordRequest request,
+        Authentication authentication
+    ) {
+        AdminUser user = adminUserRepository.findByUsername(authentication.getName()).orElse(null);
+        if (user == null || !passwordEncoder.matches(request.currentPassword(), user.passwordHash())) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(400, "current password is incorrect"));
+        }
+        if (passwordEncoder.matches(request.newPassword(), user.passwordHash())) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(400, "new password must differ from current password"));
+        }
+        if (request.newPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+            return ResponseEntity.badRequest().body(ApiResponse.fail(400, "new password must be at most 72 bytes"));
+        }
+
+        adminUserRepository.updatePassword(user.username(), passwordEncoder.encode(request.newPassword()));
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("updated", true)));
+    }
+
     @GetMapping("/csrf")
     public ApiResponse<Map<String, String>> csrf(CsrfToken token) {
         return ApiResponse.ok(Map.of("headerName", token.getHeaderName(), "token", token.getToken()));
@@ -91,5 +119,11 @@ public class AdminAuthController {
     }
 
     public record LoginRequest(@NotBlank String username, @NotBlank String password) {
+    }
+
+    public record ChangePasswordRequest(
+        @NotBlank String currentPassword,
+        @NotBlank @Size(min = 8, max = 72) String newPassword
+    ) {
     }
 }

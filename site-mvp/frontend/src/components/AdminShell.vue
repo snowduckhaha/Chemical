@@ -20,6 +20,8 @@
         <p class="nav-group">客户与数据</p>
         <RouterLink :to="`/${lang}/admin/inquiries`"><span aria-hidden="true">✉</span>询盘管理</RouterLink>
         <RouterLink v-if="auth.isAdmin" :to="`/${lang}/admin/analytics`"><span aria-hidden="true">⌁</span>数据概览</RouterLink>
+        <p class="nav-group">账户</p>
+        <RouterLink :to="`/${lang}/admin/account/password`"><span aria-hidden="true">⚿</span>修改密码</RouterLink>
       </nav>
       <div class="sidebar-user">
         <span class="avatar">{{ userInitial }}</span>
@@ -36,7 +38,7 @@
           <h1>{{ title }}</h1>
           <p>{{ subtitle }}</p>
         </div>
-        <div class="topbar-actions"><span class="role-pill">{{ auth.isAdmin ? "ADMIN" : "OPERATOR" }}</span><RouterLink :to="`/${lang}`" target="_blank">查看网站 ↗</RouterLink></div>
+        <div class="topbar-actions"><span class="role-pill">{{ auth.isAdmin ? "ADMIN" : "OPERATOR" }}</span><RouterLink :to="`/${lang}/admin/account/password`">修改密码</RouterLink><RouterLink :to="`/${lang}`" target="_blank">查看网站 ↗</RouterLink></div>
       </header>
       <main class="admin-page"><slot /></main>
     </div>

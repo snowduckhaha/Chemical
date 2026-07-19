@@ -57,6 +57,12 @@ export const adminLogout = () =>
 
 export const adminMe = () => request<AdminSession>("/admin/auth/me");
 
+export const adminChangePassword = (currentPassword: string, newPassword: string) =>
+  request<{ updated: boolean }>("/admin/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({ currentPassword, newPassword })
+  });
+
 export const adminCsrf = async () => {
   const token = await request<{ headerName: string; token: string }>("/admin/auth/csrf");
   csrfToken = token.token;

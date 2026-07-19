@@ -180,6 +180,51 @@ class SiteApiIntegrationTest {
     }
 
     @Test
+    void authenticatedUserCanChangeTheirOwnPasswordWithCsrf() throws Exception {
+        String username = "password-it-" + UUID.randomUUID().toString().substring(0, 12);
+        String oldPassword = "Old-Integration-Password";
+        String newPassword = "New-Integration-Password";
+        jdbcTemplate.update("""
+            INSERT INTO admin_user (username, password_hash, role_code, enabled, must_change_password)
+            VALUES (?, ?, 'ADMIN', TRUE, TRUE)
+            """, username, passwordEncoder.encode(oldPassword));
+
+        MvcResult loginResult = mockMvc.perform(post("/api/v1/admin/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"%s\",\"password\":\"%s\"}".formatted(username, oldPassword)))
+            .andExpect(status().isOk())
+            .andReturn();
+        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+
+        mockMvc.perform(post("/api/v1/admin/auth/change-password")
+                .session(session)
+            .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"currentPassword\":\"%s\",\"newPassword\":\"%s\"}".formatted(oldPassword, newPassword)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(0))
+            .andExpect(jsonPath("$.data.updated").value(true));
+
+        String passwordHash = jdbcTemplate.queryForObject(
+            "SELECT password_hash FROM admin_user WHERE username = ?", String.class, username);
+        assertThat(passwordEncoder.matches(newPassword, passwordHash)).isTrue();
+        assertThat(passwordEncoder.matches(oldPassword, passwordHash)).isFalse();
+        assertThat(jdbcTemplate.queryForObject(
+            "SELECT must_change_password FROM admin_user WHERE username = ?", Boolean.class, username)).isFalse();
+
+        mockMvc.perform(post("/api/v1/admin/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"%s\",\"password\":\"%s\"}".formatted(username, newPassword)))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/v1/admin/auth/change-password")
+                .session(session)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"currentPassword\":\"%s\",\"newPassword\":\"Another-Password\"}".formatted(newPassword)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
     void authenticatedMultipartUploadRejectsInvalidImageContent() throws Exception {
         MockHttpSession session = loginAsUniqueAdmin();
         MockMultipartFile invalidFile = new MockMultipartFile(

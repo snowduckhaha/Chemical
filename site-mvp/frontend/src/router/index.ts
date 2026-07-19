@@ -51,6 +51,12 @@ const routes = [
     component: () => import("../views/AdminLoginView.vue")
   },
   {
+    path: "/:lang(zh|en)/admin/account/password",
+    name: "admin-change-password",
+    component: () => import("../views/AdminChangePasswordView.vue"),
+    meta: { requiresAdmin: true }
+  },
+  {
     path: "/:lang(zh|en)/admin/products",
     redirect: (to) => `/${to.params.lang}/admin/products/categories`
   },

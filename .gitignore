@@ -3,6 +3,7 @@
 .env
 .env.*
 !.env.example
+!site-mvp/deploy/.env.production.example
 *.pem
 *.key
 *.pfx
