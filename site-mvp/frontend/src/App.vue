@@ -99,23 +99,31 @@
             }}
           </p>
           <div class="socials">
-            <a href="https://api.whatsapp.com" target="_blank" rel="noreferrer" aria-label="WhatsApp">◔</a>
-            <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">in</a>
-            <a href="https://www.x.com" target="_blank" rel="noreferrer" aria-label="X">X</a>
-            <a href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">f</a>
+            <a href="https://api.whatsapp.com/send?phone=8613728111347" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+              <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor"><path d="M254-59L0-128L69 126Q35 185 17.5 250.5Q0 316 0 384Q0 488 40 583Q79 675 150 746Q221 817 313 856Q408 896 512 896Q616 896 711 856Q803 817 874 746Q945 675 984 583Q1024 488 1024 384Q1024 280 984 185Q945 93 874 22Q803-49 711-88Q616-128 512-128Q444-128 378.5-110.5Q313-93 254-59Z M327 624Q317 624 308.5 619Q300 614 293 607Q288 603 282 594L280 592Q251 554 251 506Q251 471 268 433Q301 361 369 293L374 288Q392 270 402 261Q488 185 598 156L628 152Q636 151 652 152L656 153Q679 154 699 164Q709 170 718 176L725 180Q734 187 741 194.5Q748 202 752 210Q759 224 762 248Q763 258 763 266L763 267Q763 271 760 275Q757 279 753 281L651 326Q647 328 642 328Q631 329 623 321Q622 321 582 274Q579 269 574 267.5Q569 266 563.5 267Q558 268 554 270L541 276Q496 295 460 327L442 345Q411 374 389 410L386 415Q383 420 381.5 425Q380 430 382 435L384 439L402 460Q410 469 416 479Q426 495 421 506Q399 559 376 611Q374 616 368.5 619.5Q363 623 356 624L348 624Q338 625 327 624Z"/></svg>
+            </a>
+            <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+              <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor"><path d="M366-91L366 567L568 567L568 463L571 463Q595 506 643 534Q699 567 771 567Q873 567 931 526Q984 489 1006 417Q1024 357 1024 261L1024-91L813-91L813 221Q813 272 809 298Q801 341 780 364Q753 391 703 391Q628 391 599 340Q577 302 577 226L577-91L366-91Z M0-91L0 567L219 567L219-91L0-91Z M219 750Q219 720 204.5 694.5Q190 669 164.5 654.5Q139 640 109.5 640Q80 640 54.5 654.5Q29 669 14.5 694.5Q0 720 0 749.5Q0 779 15 804.5Q30 830 55 844.5Q80 859 110 859Q140 859 165 844.5Q190 830 204.5 804.5Q219 779 219 750Z"/></svg>
+            </a>
+            <a href="https://www.x.com" target="_blank" rel="noreferrer" aria-label="X">
+              <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor"><path d="M548 551L806 847L963 847L620 455L1024-79L708-79L461 245L177-79L20-79L387 341L0 847L324 847L548 551Z M183 758L751 15L838 15L277 758L183 758Z"/></svg>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61587635175242" target="_blank" rel="noreferrer" aria-label="Facebook">
+              <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor"><path d="M593 384L593-128L401-128L401 384L273 384L273 560L401 560L400 664Q400 742 417 788Q436 842 480 868Q527 896 609 896L750 896L750 720L662 720Q630 720 615.5 712Q601 704 596 688Q593 676 593 649L593 561L751 561L733 384L593 384Z"/></svg>
+            </a>
           </div>
         </section>
 
         <section>
           <h4>{{ lang === "zh" ? "联系我们" : "Contact" }}</h4>
-          <a href="tel:+8619063971053">{{ lang === "zh" ? "电话: 19063971053" : "Tel: +86 19063971053" }}</a>
-          <a href="tel:+865336535999">{{ lang === "zh" ? "电话: 533-6535999" : "Tel: +86 533-6535999" }}</a>
-          <a href="mailto:info@qidian-chemical.com">{{ lang === "zh" ? "电子邮件: info@qidian-chemical.com" : "Email: info@qidian-chemical.com" }}</a>
+          <a href="tel:+8613580598793">{{ lang === "zh" ? "电话: +86-13580598793" : "Tel: +86-13580598793" }}</a>
+          <a href="tel:+886076985166074">{{ lang === "zh" ? "电话/传真: 00886-0769-85166074" : "Tel&Fax: 00886-0769-85166074" }}</a>
+          <a href="mailto:renee957888@gmail.com">{{ lang === "zh" ? "电子邮件: renee957888@gmail.com" : "Email: renee957888@gmail.com" }}</a>
           <p>
             {{
               lang === "zh"
-                ? "地址: 山东省淄博经济开发区天浩路388号, 邮编: 255300"
-                : "Address: Tianhao Road 388, Zibo Economic Development Zone, Shandong 255300"
+                ? "地址: 中国广东省深圳市前进路兴业公司4号楼2层212室"
+                : "ADD: No.212, 2nd Floor, Building 4, Xingye Company, Qianjin Road, Shenzhen City, Guangdong Province, China"
             }}
           </p>
         </section>
@@ -137,7 +145,7 @@
       </div>
 
       <div class="footer-meta">
-        <span>{{ lang === "zh" ? "©2025 淄博博丰新材料科技有限公司版权所有。鲁ICP备14031418号" : "©2025 Zibo Bofeng New Material Technology Co., Ltd. All rights reserved." }}</span>
+        <span>{{ lang === "zh" ? "©2026 深圳市起点化工有限公司版权所有。" : "©2026 Shenzhen Qidian Chemical Industry Co.,Ltd.. All rights reserved." }}</span>
         <span>{{ lang === "zh" ? "隐私协议" : "Privacy Agreement" }}</span>
       </div>
     </footer>
@@ -827,6 +835,11 @@ watch(
   color: #6d7483;
   font-size: 18px;
   line-height: 1;
+  border-radius: 6px;
+}
+
+.socials svg {
+  transform: scaleY(-1);
 }
 
 .footer-meta {

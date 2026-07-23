@@ -23,9 +23,7 @@ services:
       - private
 
   backend:
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile.backend
+    image: ${BACKEND_IMAGE:-ghcr.io/snowduckhaha/chemical-backend:latest}
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -43,9 +41,7 @@ services:
       - private
 
   frontend:
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile.frontend
+    image: ${FRONTEND_IMAGE:-ghcr.io/snowduckhaha/chemical-frontend:latest}
     restart: unless-stopped
     depends_on:
       - backend
@@ -57,12 +53,9 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./nginx/site.conf.template:/etc/nginx/templates/site.conf.template:ro
       - ${UPLOADS_DIR}:/srv/uploads:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-      - /var/www/certbot:/var/www/certbot:ro
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN}
     depends_on:

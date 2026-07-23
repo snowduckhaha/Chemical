@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS product (
   parameters_json JSON NULL,
   packaging_zh VARCHAR(500) NULL,
   packaging_en VARCHAR(500) NULL,
+  sort_order INT NOT NULL DEFAULT 0,
   publish_status VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
   deleted_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
