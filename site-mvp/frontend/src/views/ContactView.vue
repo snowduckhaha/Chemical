@@ -1,31 +1,33 @@
 <template>
-  <section class="page">
-    <h1>{{ lang === "en" ? "Contact Us" : "联系我们" }}</h1>
-    <p>{{ lang === "en" ? "Leave your inquiry and we will reply soon." : "提交你的需求，我们会尽快联系。" }}</p>
-    <p v-if="applicationSlug" class="application-context">
-      {{ lang === "en" ? `Inquiry source: ${applicationSlug}` : `咨询来源：${applicationSlug}` }}
-    </p>
+  <div class="contact-page">
+    <section class="page-shell">
+      <h1>{{ lang === "en" ? "Contact Us" : "联系我们" }}</h1>
+      <p>{{ lang === "en" ? "Leave your inquiry and we will reply soon." : "提交你的需求，我们会尽快联系。" }}</p>
+      <p v-if="applicationSlug" class="application-context">
+        {{ lang === "en" ? `Inquiry source: ${applicationSlug}` : `咨询来源：${applicationSlug}` }}
+      </p>
 
-    <el-form :model="form" label-position="top" @submit.prevent="submit">
-      <el-form-item :label="lang === 'en' ? 'Name' : '姓名'">
-        <el-input v-model="form.name" />
-      </el-form-item>
-      <el-form-item :label="lang === 'en' ? 'Company' : '公司'">
-        <el-input v-model="form.company" />
-      </el-form-item>
-      <el-form-item :label="lang === 'en' ? 'Email' : '邮箱'">
-        <el-input v-model="form.email" />
-      </el-form-item>
-      <el-form-item :label="lang === 'en' ? 'Message' : '留言'">
-        <el-input v-model="form.message" type="textarea" :rows="4" />
-      </el-form-item>
-      <el-button type="primary" native-type="submit" :loading="submitting">
-        {{ lang === "en" ? "Submit Inquiry" : "提交询盘" }}
-      </el-button>
-    </el-form>
+      <el-form :model="form" label-position="top" @submit.prevent="submit">
+        <el-form-item :label="lang === 'en' ? 'Name' : '姓名'">
+          <el-input v-model="form.name" />
+        </el-form-item>
+        <el-form-item :label="lang === 'en' ? 'Company' : '公司'">
+          <el-input v-model="form.company" />
+        </el-form-item>
+        <el-form-item :label="lang === 'en' ? 'Email' : '邮箱'">
+          <el-input v-model="form.email" />
+        </el-form-item>
+        <el-form-item :label="lang === 'en' ? 'Message' : '留言'">
+          <el-input v-model="form.message" type="textarea" :rows="4" />
+        </el-form-item>
+        <el-button type="primary" native-type="submit" :loading="submitting">
+          {{ lang === "en" ? "Submit Inquiry" : "提交询盘" }}
+        </el-button>
+      </el-form>
 
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-  </section>
+      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -78,10 +80,17 @@ onMounted(() => trackEvent("inquiry_form_open", "contact", { payload: { form_key
 </script>
 
 <style scoped>
-.page {
+.contact-page {
+  width: 100%;
+}
+
+.page-shell {
+  width: min(var(--site-width), calc(100vw - (var(--site-gutter) * 2)));
+  margin: 0 auto;
   display: grid;
   gap: 12px;
   max-width: 720px;
+  padding: 40px 0;
 }
 
 .error {
