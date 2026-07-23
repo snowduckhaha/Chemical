@@ -24,40 +24,23 @@ else
 fi
 
 mkdir -p "$UPLOADS_DIR" "$MYSQL_DATA_DIR"
-chown 999:999 "$MYSQL_DATA_DIR"
-chmod 0700 "$MYSQL_DATA_DIR"
 
 if [[ -n "${GHCR_USERNAME:-}" && -n "${GHCR_TOKEN:-}" ]]; then
   printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 fi
 
 docker compose --env-file .env -f "$COMPOSE_FILE" pull backend frontend
-docker compose --env-file .env -f "$COMPOSE_FILE" up -d mysql
+docker compose --env-file .env -f "$COMPOSE_FILE" up -d --remove-orphans
 
-for _ in $(seq 1 60); do
-  if docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql mysqladmin ping -h 127.0.0.1 -uroot -p"${MYSQL_ROOT_PASSWORD}" --silent; then
+# Wait for backend health (up to 120s)
+for _ in $(seq 1 24); do
+  if curl --fail --silent --show-error --retry 1 "http://${SITE_DOMAIN}/api/v1/health"; then
     break
   fi
-  sleep 2
+  sleep 5
 done
 
-docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql mysqladmin ping -h 127.0.0.1 -uroot -p"${MYSQL_ROOT_PASSWORD}" --silent
-
-sql_scripts=(
-  mvp_schema.sql product_center_schema_v2.sql V3__admin_auth.sql V4__admin_uploads.sql
-  V5__product_soft_delete.sql V6__inquiry_admin.sql V7__certificate_management.sql
-  V8__seo_admin.sql V9__analytics.sql V10__product_content_fields.sql
-  V11__inquiry_lead_score.sql V12__news_admin.sql V13__repair_seed_media_urls.sql
-  V14__application_field_configuration.sql V15__seed_initial_news_categories.sql
-  V16__temporary_news_reference_assets.sql mvp_seed.sql
-)
-for script in "${sql_scripts[@]}"; do
-  docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql \
-    mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" qidian_site <"$APP_DIR/sql/$script"
-done
-
-docker compose --env-file .env -f "$COMPOSE_FILE" up -d --remove-orphans
-curl --fail --silent --show-error --retry 12 --retry-delay 5 "http://${SITE_DOMAIN}/api/v1/health"
+curl --fail --silent --show-error --retry 3 --retry-delay 5 "http://${SITE_DOMAIN}/api/v1/health"
 docker image prune -f
 
 echo "Deployment completed successfully."
