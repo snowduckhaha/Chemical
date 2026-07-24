@@ -45,6 +45,7 @@
     </section>
 
     <section class="detail-tabs">
+      <div class="tab-content-wrapper">
       <div class="tab-list" role="tablist" :aria-label="lang === 'en' ? 'Product information' : '产品信息'">
         <button
           v-for="tab in tabs"
@@ -64,11 +65,12 @@
         </ul>
       </div>
       <div v-else-if="activeTab === 'parameters'" class="tab-panel parameter-table" role="tabpanel">
-        <div class="parameter-row parameter-head-row"><span>{{ lang === "en" ? "Parameter" : "参数项" }}</span><span>{{ lang === "en" ? "Value" : "参数值" }}</span></div>
-        <div v-for="item in detail.parameters" :key="item.label" class="parameter-row"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div>
+        <div class="parameter-row parameter-head-row"><span>{{ lang === "en" ? "Parameter" : "参数项" }}</span><span>{{ lang === "en" ? "Value" : "参数值" }}</span><span>{{ lang === "en" ? "Unit" : "单位" }}</span></div>
+        <div v-for="item in detail.parameters" :key="item.label" class="parameter-row"><span>{{ item.label }}</span><strong>{{ item.value }}</strong><span class="param-unit">{{ item.unit || '-' }}</span></div>
       </div>
       <div v-else class="tab-panel statement-panel" role="tabpanel">
-        <p>{{ detail.packaging || (lang === "en" ? "Product information is provided for reference. Please contact us for packaging, storage and technical guidance." : "产品资料仅供参考。包装、储存及技术应用细节请联系销售人员确认。") }}</p>
+        <p>{{ lang === "en" ? "The information provided here is believed to be accurate and reliable, but is not intended to meet any specific specification, nor does it constitute any warranty or guarantee. All data listed here are reference values and subject to production tolerances. These values are for product description purposes only and do not constitute any warranty regarding their performance. Users are responsible for testing the product themselves to determine its suitability for their application." : "此处提供的信息据信准确可靠，但并非旨在满足任何特定规格，也不构成任何保证或担保。此处列出的所有数据均为参考值，并受生产公差的影响。这些数值仅用于产品描述，不对其性能做出任何保证。用户有责任自行测试产品是否适用于其应用。" }}</p>
+      </div>
       </div>
     </section>
   </div>
@@ -91,9 +93,9 @@ const categoryName = ref("");
 const seriesName = ref("");
 const activeTab = ref<"applications" | "parameters" | "statement">("applications");
 const tabs = computed(() => [
-  { key: "applications" as const, label: lang.value === "en" ? "Product Applications" : "产品应用领域" },
-  { key: "parameters" as const, label: lang.value === "en" ? "Product Indicators" : "产品参数表" },
-  { key: "statement" as const, label: lang.value === "en" ? "Disclaimer" : "声明" }
+  { key: "applications" as const, label: lang.value === "en" ? "Product Applications" : "产品应用" },
+  { key: "parameters" as const, label: lang.value === "en" ? "Product Indicators" : "产品指标" },
+  { key: "statement" as const, label: lang.value === "en" ? "Disclaimer" : "免责声明" }
 ]);
 
 const trackInquiry = () => {
@@ -310,33 +312,59 @@ watch([lang, categorySlug, seriesSlug, productSlug], loadPage);
 .tab-button.is-active::after { background: #1296e1; }
 .tab-panel { min-height: 190px; padding: 34px 0 10px; }
 
+.tab-content-wrapper {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
 .parameter-table {
   display: grid;
   border-top: 1px solid #dcdcdc;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .parameter-row {
   display: grid;
-  grid-template-columns: minmax(220px, 0.95fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 0.8fr) minmax(0, 0.5fr);
   gap: 16px;
-  padding: 14px 0;
-  border-bottom: 1px solid #dcdcdc;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8e8e8;
   color: #333;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
+  transition: background-color 0.15s ease;
+}
+
+.parameter-row:last-child {
+  border-bottom: none;
+}
+
+.parameter-row:not(.parameter-head-row):hover {
+  background-color: #f7f9fb;
 }
 
 .parameter-head-row {
   padding-top: 0;
-  color: #656565;
+  color: #888;
   font-weight: 600;
+  font-size: 14px;
+  background-color: #fafbfc;
+  border-bottom: 2px solid #e0e0e0;
+  letter-spacing: 0.02em;
 }
 
 .parameter-row strong {
   font-weight: 600;
+  color: #1a1a1a;
 }
 
-.statement-panel p { max-width: 800px; margin: 0; color: #666; font-size: 16px; line-height: 1.8; }
+.param-unit {
+  color: #999;
+  font-size: 14px;
+}
+
+.statement-panel p { max-width: 100%; margin: 0; color: #666; font-size: 16px; line-height: 1.8; }
 
 @media (max-width: 1120px) {
   .product-overview,

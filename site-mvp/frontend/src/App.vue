@@ -108,7 +108,7 @@
             <a href="https://www.x.com" target="_blank" rel="noreferrer" aria-label="X">
               <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor"><path d="M548 551L806 847L963 847L620 455L1024-79L708-79L461 245L177-79L20-79L387 341L0 847L324 847L548 551Z M183 758L751 15L838 15L277 758L183 758Z"/></svg>
             </a>
-            <a href="https://www.facebook.com/profile.php?id=61587635175242" target="_blank" rel="noreferrer" aria-label="Facebook">
+            <a href="https://www.facebook.com/share/1EFonQQsgZ/?mibextid=wwXIfr" target="_blank" rel="noreferrer" aria-label="Facebook">
               <svg viewBox="0 0 1024 1024" width="20" height="20" fill="currentColor"><path d="M593 384L593-128L401-128L401 384L273 384L273 560L401 560L400 664Q400 742 417 788Q436 842 480 868Q527 896 609 896L750 896L750 720L662 720Q630 720 615.5 712Q601 704 596 688Q593 676 593 649L593 561L751 561L733 384L593 384Z"/></svg>
             </a>
           </div>

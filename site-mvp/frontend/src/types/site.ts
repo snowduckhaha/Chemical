@@ -39,6 +39,7 @@ export type Series = {
 export type ParameterItem = {
   label: string;
   value: string;
+  unit?: string;
 };
 
 export type Product = {
@@ -131,6 +132,7 @@ export type InquiryPayload = {
   interestedProduct?: string;
   message: string;
   sourcePage?: string;
+  captchaCode: string;
 };
 
 export type InquiryResult = {

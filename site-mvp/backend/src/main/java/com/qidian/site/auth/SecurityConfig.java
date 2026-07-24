@@ -95,6 +95,8 @@ public class SecurityConfig {
                     "/api/v1/admin/auth/login",
                     "/api/v1/admin/auth/logout",
                     "/api/v1/inquiries",
+                    "/api/v1/captcha",
+                    "/api/v1/captcha/verify",
                     "/api/v1/analytics/events"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(authorize -> authorize

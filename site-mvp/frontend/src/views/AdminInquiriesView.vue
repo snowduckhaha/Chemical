@@ -22,7 +22,7 @@
         <p v-else-if="!inquiries.length" class="empty">没有符合条件的询盘。</p>
         <div v-else class="table-wrap"><table><thead><tr><th>客户</th><th>感兴趣产品</th><th>意向</th><th>状态</th><th>提交时间</th><th>操作</th></tr></thead><tbody>
           <tr v-for="item in inquiries" :key="Number(item.id)" :class="{ selected: Number(selected?.id) === Number(item.id) }">
-            <td><strong>{{ item.name }}</strong><small>{{ item.company || "未填写公司" }}</small><small>{{ item.email }}</small></td>
+            <td><strong>{{ item.name }}</strong><small>{{ item.company || "未填写公司" }}</small><small>{{ item.email }}</small><small v-if="item.phone">{{ item.phone }}</small></td>
             <td>{{ item.interested_product || "未指定" }}</td>
             <td><span class="score" :class="{ high: Number(item.lead_score) >= 40 }">{{ item.lead_score }} 分</span><span v-if="item.overdue_high_intent" class="overdue">超过 24 小时未跟进</span></td>
             <td><span class="status" :class="String(item.inquiry_status).toLowerCase()">{{ statusLabel(item.inquiry_status) }}</span></td>

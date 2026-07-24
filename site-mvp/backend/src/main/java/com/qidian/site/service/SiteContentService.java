@@ -775,7 +775,7 @@ public class SiteContentService {
 
     private List<ParameterItem> getProductParameterItems(Long productId, String lang) {
         String sql = """
-            SELECT param_name_zh, param_name_en, param_value_raw
+            SELECT param_name_zh, param_name_en, param_value_raw, unit
             FROM product_parameter
             WHERE product_id = ?
               AND publish_status = 'PUBLISHED'
@@ -783,7 +783,8 @@ public class SiteContentService {
             """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> new ParameterItem(
             localized(lang, rs.getString("param_name_zh"), rs.getString("param_name_en")),
-            rs.getString("param_value_raw")
+            rs.getString("param_value_raw"),
+            rs.getString("unit")
         ), productId);
     }
 

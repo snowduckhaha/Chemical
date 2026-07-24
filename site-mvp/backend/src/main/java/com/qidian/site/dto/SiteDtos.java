@@ -47,7 +47,7 @@ public class SiteDtos {
                           String publishStatus) {
     }
 
-    public record ParameterItem(String label, String value) {
+    public record ParameterItem(String label, String value, String unit) {
     }
 
     public record LinkedSeries(String categorySlug, String seriesSlug, String title, String summary, String image) {
@@ -121,6 +121,16 @@ public class SiteDtos {
         private String message;
 
         private String sourcePage;
+
+        private String captchaCode;
+
+        public String getCaptchaCode() {
+            return captchaCode;
+        }
+
+        public void setCaptchaCode(String captchaCode) {
+            this.captchaCode = captchaCode;
+        }
 
         public String getLang() {
             return lang;

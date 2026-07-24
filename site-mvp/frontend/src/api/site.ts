@@ -134,6 +134,9 @@ export const createInquiry = (body: InquiryPayload) =>
     body: JSON.stringify(body)
   });
 
+export const getCaptcha = () =>
+  request<{ image: string; sessionId: string }>("/captcha");
+
 export const adminListCategories = () => request<Array<Record<string, unknown>>>("/admin/products/categories");
 export const adminCreateCategory = (body: Record<string, unknown>) =>
   request<{ id: number }>("/admin/products/categories", {

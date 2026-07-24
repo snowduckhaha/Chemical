@@ -4,13 +4,16 @@ import com.qidian.site.dto.ApiResponse;
 import com.qidian.site.dto.SiteDtos.InquiryRequest;
 import com.qidian.site.dto.SiteDtos.InquiryResult;
 import com.qidian.site.service.SiteContentService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -144,7 +147,15 @@ public class SiteController {
     }
 
     @PostMapping("/inquiries")
-    public ApiResponse<?> createInquiry(@Valid @RequestBody InquiryRequest request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<?> createInquiry(@Valid @RequestBody InquiryRequest request, HttpServletRequest httpRequest) {
+        String captchaCode = request.getCaptchaCode();
+        if (captchaCode == null || captchaCode.isBlank()) {
+            return ApiResponse.fail(400, "captcha required");
+        }
+        if (!CaptchaController.verifyFromSession(httpRequest, captchaCode)) {
+            return ApiResponse.fail(400, "invalid captcha");
+        }
         InquiryResult result = siteContentService.createInquiry(request);
         return ApiResponse.ok(result);
     }
