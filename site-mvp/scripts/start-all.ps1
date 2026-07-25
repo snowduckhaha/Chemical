@@ -24,7 +24,7 @@ Write-Host '[3/4] Checking database schema and seed...'
 & "$PSScriptRoot\db-check-and-sync.ps1"
 
 Write-Host '[4/4] Starting backend and frontend...'
-Start-Process powershell -ArgumentList '-NoExit', '-Command', "Set-Location '$root\\backend'; mvn spring-boot:run"
+Start-Process powershell -ArgumentList '-NoExit', '-Command', "`$env:DB_USERNAME='qidian'; `$env:DB_PASSWORD='qidian_app_2024'; Set-Location '$root\\backend'; mvn spring-boot:run"
 Start-Process powershell -ArgumentList '-NoExit', '-Command', "Set-Location '$root\\frontend'; npm run dev"
 
 Write-Host ''

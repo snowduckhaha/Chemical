@@ -96,7 +96,7 @@ const text = computed(() => {
         {
           index: "01",
           title: "Focused Material Portfolio",
-          description: "Covering aluminum hydroxide, magnesium hydroxide, nano alumina and boehmite for flame-retardant and functional applications."
+          description: "Covering aluminum hydroxide, silica powder, alumina powder and silane coupling agent for flame-retardant and functional applications."
         },
         {
           index: "02",
@@ -144,7 +144,7 @@ const text = computed(() => {
       {
         index: "01",
         title: "专注材料方向",
-        description: "围绕氢氧化铝、氢氧化镁、纳米氧化铝、勃姆石等系列，服务多类阻燃与功能化应用。"
+        description: "围绕氢氧化铝、硅粉、氧化铝粉末、硅烷偶联剂等系列，服务多类阻燃与功能化应用。"
       },
       {
         index: "02",
@@ -154,7 +154,7 @@ const text = computed(() => {
       {
         index: "03",
         title: "快速交付响应",
-        description: "中转仓覆盖江苏常州、江西宜春、广东东莞，正常接单后三天内可送达客户仓库。"
+        description: "中转仓覆盖江苏常州、江西宜春、广东东莞，正常接单后中国大陆三天内可送达客户仓库。"
       },
       {
         index: "04",

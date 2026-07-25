@@ -17,7 +17,6 @@
           <p class="section-kicker">CERTIFICATES</p>
           <h1 id="certificate-title">{{ text.certificateTitle }}</h1>
         </div>
-        <p>{{ text.certificateIntro }}</p>
       </div>
 
       <div v-if="publishedCertificates.length > 0" class="certificate-marquee" aria-label="Certificate carousel">
@@ -93,7 +92,6 @@ const text = computed(() => {
       breadcrumbHome: "Home",
       breadcrumbCurrent: "Certificates",
       certificateTitle: "Certificates",
-      certificateIntro: "Certificate records are maintained through the admin system. The first records are based on confirmed ISO 9001 and ISO 14001 materials.",
       certificateEmpty: "Certificates will be updated soon.",
       closePreview: "Close certificate preview"
     };
@@ -103,7 +101,6 @@ const text = computed(() => {
     breadcrumbHome: "首页",
     breadcrumbCurrent: "荣誉证书",
     certificateTitle: "荣誉证书",
-    certificateIntro: "证书记录由后台系统维护，首批内容来自已确认的 ISO 9001 与 ISO 14001 资料。",
     certificateEmpty: "荣誉证书将陆续更新。",
     closePreview: "关闭证书预览"
   };

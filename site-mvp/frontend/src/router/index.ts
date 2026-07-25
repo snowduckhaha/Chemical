@@ -46,6 +46,11 @@ const routes = [
     component: () => import("../views/ProductDetailView.vue")
   },
   {
+    path: "/:lang(zh|en)/search",
+    name: "search",
+    component: () => import("../views/SearchResultsView.vue")
+  },
+  {
     path: "/:lang(zh|en)/admin/login",
     name: "admin-login",
     component: () => import("../views/AdminLoginView.vue")

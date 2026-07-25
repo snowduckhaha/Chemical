@@ -26,13 +26,6 @@
         </h1>
       </div>
       <div class="intro-copy">
-        <p>
-          {{
-            lang === "en"
-              ? "Our product line covers multiple advanced material categories, each extending to series information, product imagery, application direction, and technical parameter access."
-              : "产品中心围绕多类别先进材料展开，每个大类下继续承接系列信息、产品图片、应用方向和技术参数查看入口。"
-          }}
-        </p>
         <p class="intro-copy-emphasis">
           {{
             lang === "en"

@@ -348,6 +348,10 @@ public class SiteContentService {
                 OR p.slug LIKE ?
                 OR p.name_zh LIKE ?
                 OR p.name_en LIKE ?
+                OR c.name_zh LIKE ?
+                OR c.name_en LIKE ?
+                OR s.name_zh LIKE ?
+                OR s.name_en LIKE ?
               )
             ORDER BY p.sort_order ASC, p.id ASC
             LIMIT 50
@@ -371,7 +375,7 @@ public class SiteContentService {
                     localized(lang, rs.getString("packaging_zh"), rs.getString("packaging_en")),
                     rs.getString("publish_status")
                 );
-            }, like, like, like, like);
+            }, like, like, like, like, like, like, like, like);
         } catch (DataAccessException ex) {
             return List.of();
         }

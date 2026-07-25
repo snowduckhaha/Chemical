@@ -3,7 +3,7 @@
     <section class="hero-wrap">
       <div class="hero-stage" :style="{ background: slides[activeSlide].image }">
         <div class="hero-overlay">
-          <p class="hero-kicker">{{ lang === "en" ? "MATERIAL SOLUTIONS" : "材料解决方案" }}</p>
+          <p v-if="activeSlide === 1" class="hero-kicker">{{ lang === "en" ? "MATERIAL SOLUTIONS" : "材料解决方案" }}</p>
           <h1>{{ slides[activeSlide].title }}</h1>
           <p>{{ slides[activeSlide].subtitle }}</p>
         </div>
@@ -174,18 +174,18 @@ const slides = computed(() => {
   if (lang.value === "en") {
     return [
       {
-        title: "Advanced Material Solutions",
-        subtitle: "Focused on flame-retardant and functional inorganic materials for global B2B customers.",
+        title: "Green Chemicals, Shaping a Sustainable Future Together",
+        subtitle: "",
         image: "linear-gradient(115deg, rgba(12,45,90,0.72), rgba(24,92,161,0.45)), url('/home/hero-1.png') center/cover no-repeat"
       },
       {
-        title: "Stable Quality, Faster Delivery",
-        subtitle: "Transit warehouse network improves response speed and order fulfillment efficiency.",
+        title: "Focused on Flame-Retardant and Functional Inorganic Materials",
+        subtitle: "Providing stable supply and technical support for global B2B customers.",
         image: "linear-gradient(115deg, rgba(12,45,90,0.72), rgba(24,92,161,0.45)), url('/home/hero-2.png') center/cover no-repeat"
       },
       {
-        title: "From Category To Product Detail",
-        subtitle: "Clear sourcing path from category to series and product technical review.",
+        title: "Global Layout, Efficient Delivery",
+        subtitle: "Transit warehouse network improves response speed and reduces delivery uncertainty.",
         image: "linear-gradient(115deg, rgba(12,45,90,0.72), rgba(24,92,161,0.45)), url('/home/hero-3.png') center/cover no-repeat"
       }
     ];
@@ -193,18 +193,18 @@ const slides = computed(() => {
 
   return [
     {
-      title: "先进材料解决方案",
-      subtitle: "专注阻燃与功能性无机材料，为全球 B2B 客户提供稳定供货与技术支持。",
+      title: "绿色化工，共创可持续未来",
+      subtitle: "",
       image: "linear-gradient(115deg, rgba(12,45,90,0.72), rgba(24,92,161,0.45)), url('/home/hero-1.png') center/cover no-repeat"
     },
     {
-      title: "质量稳定，交付更快",
-      subtitle: "通过多地中转仓布局提升响应效率，降低交付不确定性。",
+      title: "专注阻燃与功能性无机材料",
+      subtitle: "为全球 B2B 客户提供稳定供货与技术支持。",
       image: "linear-gradient(115deg, rgba(12,45,90,0.72), rgba(24,92,161,0.45)), url('/home/hero-2.png') center/cover no-repeat"
     },
     {
-      title: "从分类到详情的清晰路径",
-      subtitle: "遵循分类-系列-详情结构，便于采购与技术评估快速定位。",
+      title: "全球布局，高效交付",
+      subtitle: "通过多地中转仓布局提升响应效率，降低交付不确定性。",
       image: "linear-gradient(115deg, rgba(12,45,90,0.72), rgba(24,92,161,0.45)), url('/home/hero-3.png') center/cover no-repeat"
     }
   ];
@@ -268,7 +268,7 @@ const loadPage = async () => {
   }
   slideTimer = setInterval(() => {
     activeSlide.value = (activeSlide.value + 1) % slides.value.length;
-  }, 4500);
+  }, 5500);
 };
 
 onMounted(loadPage);
@@ -809,17 +809,17 @@ const thumbStyle = (item: Category) => {
 }
 
 .hero-index {
-  right: max(36px, calc((100vw - 1200px) / 2));
-  bottom: clamp(38px, 7vw, 106px);
+  right: 24px;
+  bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
 
 .hero-step {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -914,7 +914,7 @@ const thumbStyle = (item: Category) => {
   .solution-section, .applications-section, .company-section, .project-cta, .news-section { width: min(860px, calc(100vw - 40px)); }
   .solution-section, .company-section, .news-section { min-height: 0; }
   .hero-overlay { left: 40px; bottom: 68px; }
-  .hero-index { right: 40px; bottom: 62px; }
+  .hero-index { right: 20px; bottom: 16px; }
   .solution-section { padding: 76px 0 82px; }
   .solution-head, .module-heading, .company-section { grid-template-columns: 1fr; display: grid; gap: 28px; }
   .solution-section .section-copy h2, .company-copy h2 { font-size: 48px; }
@@ -932,8 +932,8 @@ const thumbStyle = (item: Category) => {
   .hero-overlay h1 { font-size: 38px; }
   .hero-overlay p { font-size: 15px; line-height: 1.55; }
   .hero-kicker { font-size: 13px; }
-  .hero-index { right: 22px; bottom: 24px; gap: 12px; }
-  .hero-step { width: 24px; height: 24px; }
+  .hero-index { right: 16px; bottom: 14px; gap: 10px; }
+  .hero-step { width: 20px; height: 20px; }
   .solution-section, .applications-section, .company-section, .project-cta, .news-section { width: calc(100vw - 30px); }
   .solution-section { padding: 58px 0 62px; gap: 30px; }
   .solution-section .section-copy h2, .company-copy h2 { font-size: 39px; }

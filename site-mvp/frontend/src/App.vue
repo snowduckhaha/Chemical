@@ -67,9 +67,24 @@
             <span>{{ lang === "zh" ? "EN" : "中文" }}</span>
             <span class="lang-caret" aria-hidden="true">▾</span>
           </button>
-          <button class="search-btn" type="button" :aria-label="lang === 'zh' ? '搜索' : 'Search'">
+          <button class="search-btn" type="button" :aria-label="lang === 'zh' ? '搜索' : 'Search'" @click="openSearch">
             <span aria-hidden="true">⌕</span>
           </button>
+          <div v-if="searchOpen" class="search-overlay" @click.self="closeSearch">
+            <div class="search-panel">
+              <form class="search-form" @submit.prevent="submitSearch">
+                <input
+                  ref="searchInputRef"
+                  v-model="searchKeyword"
+                  type="text"
+                  :placeholder="lang === 'zh' ? '搜索产品...' : 'Search products...'"
+                  class="search-input"
+                />
+                <button type="submit" class="search-submit">{{ lang === 'zh' ? '搜索' : 'Search' }}</button>
+              </form>
+              <button class="search-close" type="button" @click="closeSearch" :aria-label="lang === 'zh' ? '关闭搜索' : 'Close search'">✕</button>
+            </div>
+          </div>
           <router-link class="quote-btn" :to="`/${lang}/contact`">{{ lang === "zh" ? "索取报价" : "Get Quote" }}</router-link>
           <button class="mobile-menu-btn" type="button" :aria-expanded="mobileNavOpen" :aria-label="lang === 'zh' ? '切换导航菜单' : 'Toggle navigation'" @click="mobileNavOpen = !mobileNavOpen">
             <span></span><span></span><span></span>
@@ -168,6 +183,9 @@ const applications = ref<Application[]>([]);
 const newsCategories = ref<NewsCategory[]>([]);
 const openDropdownKey = ref<string | null>(null);
 const mobileNavOpen = ref(false);
+const searchOpen = ref(false);
+const searchKeyword = ref("");
+const searchInputRef = ref<HTMLInputElement | null>(null);
 let dropdownCloseTimer: number | undefined;
 
 const lang = computed(() => {
@@ -364,8 +382,27 @@ const syncNav = async () => {
 const switchLang = async () => {
   const nextLang = lang.value === "zh" ? "en" : "zh";
   const currentPath = route.fullPath;
-  const nextPath = currentPath.replace(/^\/(zh|en)/, `/${nextLang}`);
+  const nextPath = currentPath.replace(/^(\/zh|\/en)/, `/${nextLang}`);
   await router.push(nextPath);
+};
+
+const openSearch = () => {
+  searchOpen.value = true;
+  nextTick(() => {
+    searchInputRef.value?.focus();
+  });
+};
+
+const closeSearch = () => {
+  searchOpen.value = false;
+  searchKeyword.value = "";
+};
+
+const submitSearch = () => {
+  const keyword = searchKeyword.value.trim();
+  if (!keyword) return;
+  closeSearch();
+  router.push(`/${lang.value}/search?q=${encodeURIComponent(keyword)}`);
 };
 
 onMounted(syncNav);
@@ -598,8 +635,98 @@ watch(
 }
 
 .search-btn span {
-  font-size: 1rem;
+  font-size: 1.35rem;
   line-height: 1;
+}
+
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 30, 50, 0.55);
+  z-index: 20000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 140px;
+}
+
+.search-panel {
+  width: min(640px, calc(100% - 40px));
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 20px 18px;
+  box-shadow: 0 20px 50px rgba(10, 30, 50, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-form {
+  flex: 1;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  padding: 0 16px;
+  border: 1px solid #dce6f2;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #18314f;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.search-input:focus {
+  border-color: #1296e1;
+  box-shadow: 0 0 0 3px rgba(18, 150, 225, 0.15);
+}
+
+.search-input::placeholder {
+  color: #8fa3bd;
+}
+
+.search-submit {
+  height: 46px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(251deg, #1080c0 12.92%, #1296e1 87.08%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-submit:hover {
+  box-shadow: 0 6px 14px rgba(18, 150, 225, 0.25);
+}
+
+.search-close {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #f4f8fc;
+  color: #60758f;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.search-close:hover {
+  background: #e6eef8;
+  color: #18314f;
 }
 
 .header-actions {
