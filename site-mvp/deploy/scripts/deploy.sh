@@ -57,13 +57,15 @@ rollback() {
 }
 trap rollback ERR
 
-mkdir -p "$UPLOADS_DIR" "$MYSQL_DATA_DIR"
+mkdir -p "$UPLOADS_DIR" "$MYSQL_DATA_DIR" "${BACKUP_DIR:-/opt/chemical/backups}"
 
-# Keep the database available for the new backend. This additive migration is
-# required by the CMS deployment-job agent and is safe to run repeatedly.
+# Keep the database available for the new backend. These additive migrations
+# are safe to run repeatedly and include deployment jobs plus public SEO data.
 docker compose --env-file .env -f "$COMPOSE_FILE" up -d mysql
-docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql \
-  mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" qidian_site <"$APP_DIR/sql/V19__deployment_jobs.sql"
+for migration in V19__deployment_jobs.sql V20__seo_meta_page_brand.sql V21__improve_public_image_alt_text.sql; do
+  docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql \
+    mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" qidian_site <"$APP_DIR/sql/$migration"
+done
 
 docker compose --env-file .env -f "$COMPOSE_FILE" build backend
 docker compose --env-file .env -f "$COMPOSE_FILE" up -d --no-deps --force-recreate backend

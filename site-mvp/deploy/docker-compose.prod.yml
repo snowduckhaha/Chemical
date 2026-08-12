@@ -11,6 +11,12 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
+      # Keep binary logs on the host-backed MySQL volume. The backup script
+      # rotates and archives closed logs each day as database increments.
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --sync-binlog=1
+      - --binlog-expire-logs-seconds=${MYSQL_BINLOG_RETENTION_SECONDS:-1296000}
     volumes:
       - ${MYSQL_DATA_DIR}:/var/lib/mysql
       - ../sql:/docker-entrypoint-initdb.d:ro

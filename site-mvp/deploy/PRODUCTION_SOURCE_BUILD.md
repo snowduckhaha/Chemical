@@ -19,13 +19,31 @@ CMS 发布任务 / 手工执行
 ## 服务器准备
 
 ```bash
-git clone <repository-url> /opt/chemical/app
+git clone https://github.com/snowduckhaha/Chemical.git /opt/chemical/app
 cd /opt/chemical/app/site-mvp
 cp deploy/.env.production.example .env
 chmod 600 .env
 ```
 
-填写 `.env` 中的域名、数据库密码、上传目录和数据目录。无需填写 GHCR 账号、令牌或镜像名。部署用户必须具备 Git 仓库只读权限、Docker 访问权限及私有仓库所需的 SSH 私钥。
+填写 `.env` 中的域名、数据库密码及以下宿主机持久化目录。无需填写 GHCR 账号、令牌或镜像名。部署用户必须具备 Git 仓库只读权限、Docker 访问权限及私有仓库所需的 SSH 私钥。
+
+```dotenv
+UPLOADS_DIR=/opt/chemical/uploads
+MYSQL_DATA_DIR=/opt/chemical/mysql-data
+BACKUP_DIR=/opt/chemical/backups
+BACKUP_RETENTION_DAYS=35
+MYSQL_BINLOG_RETENTION_SECONDS=1296000
+```
+
+目录用途与容器挂载如下：
+
+| 宿主机目录 | 容器路径 | 用途 |
+|---|---|---|
+| `/opt/chemical/uploads` | backend `/app/uploads`；gateway `/srv/uploads`（只读） | 后台上传图片，容器重建后保留 |
+| `/opt/chemical/mysql-data` | mysql `/var/lib/mysql` | MySQL 数据及 binary log，容器重建后保留 |
+| `/opt/chemical/backups` | 不直接挂载 | 周全量基线、每日数据库增量及每日上传图片快照 |
+
+首次部署脚本会创建这些目录；MySQL 数据目录应保持 `0700` 且归 MySQL 容器 UID 所有。不要执行 `docker compose down -v`，不要删除 `/opt/chemical/mysql-data`。
 
 首次部署：
 
@@ -79,3 +97,15 @@ journalctl -u qidian-deployment-agent -n 100 --no-pager
 - 数据库变更不可自动回滚。发布前仍应完成备份，并确保新增 SQL 是幂等或已有明确的升级步骤。
 - 成功发布后按 CDN 控制台规则刷新受影响的 HTML 页面、`/sitemap.xml` 与 `/robots.txt`。源站的 SSG 内容已经是最新的，但 CDN 仍可能保留旧的公共页面缓存。
 - 服务器至少应有 4 GiB 内存和充足磁盘空间；Docker 构建期间会同时存在新旧镜像，建议预留 10 GiB 以上可用空间。
+
+## 每日增量备份与恢复
+
+`deploy/scripts/backup-local.sh` 实现的是 **周全量基线 + 每日 MySQL binary log 增量**，而不是每天重复全量导出：每周日创建一个一致性 `mysqldump` 基线；每日任务先轮转 binary log，再归档上一段已关闭的日志，同时保存上传图片快照。默认保留 35 天，足以保留多个完整恢复链。
+
+在 `deploy` 用户的 crontab 中安装任务：
+
+```cron
+30 2 * * * APP_DIR=/opt/chemical/app/site-mvp BACKUP_DIR=/opt/chemical/backups RETENTION_DAYS=35 /opt/chemical/app/site-mvp/deploy/scripts/backup-local.sh >> /opt/chemical/backups/backup.log 2>&1
+```
+
+恢复必须在隔离环境演练，步骤为：选择故障时点之前最近的 `mysql/full/qidian_site_*.sql.gz`；导入该基线；按时间顺序解压并用 `mysqlbinlog` 回放对应 `mysql/incremental/` 日志，必要时以目标时间或位置停止；最后解压同一时点的 `uploads/uploads_*.tar.gz`。`mysql/manifests/` 保存每个基线和增量的日志坐标。恢复前禁止写入业务数据，并至少每月演练一次。

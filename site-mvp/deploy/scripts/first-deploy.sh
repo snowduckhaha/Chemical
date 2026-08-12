@@ -12,7 +12,7 @@ set -a
 source .env
 set +a
 
-mkdir -p "$UPLOADS_DIR" "$MYSQL_DATA_DIR"
+mkdir -p "$UPLOADS_DIR" "$MYSQL_DATA_DIR" "${BACKUP_DIR:-/opt/chemical/backups}"
 chown 999:999 "$MYSQL_DATA_DIR"
 chmod 0700 "$MYSQL_DATA_DIR"
 
@@ -34,7 +34,8 @@ sql_scripts=(
   V11__inquiry_lead_score.sql V12__news_admin.sql V13__repair_seed_media_urls.sql
   V14__application_field_configuration.sql V15__seed_initial_news_categories.sql
   V16__temporary_news_reference_assets.sql V18__backfill_seed_category_images.sql
-  V19__deployment_jobs.sql mvp_seed.sql
+  V19__deployment_jobs.sql V20__seo_meta_page_brand.sql V21__improve_public_image_alt_text.sql
+  mvp_seed.sql
 )
 for script in "${sql_scripts[@]}"; do
   docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql \
