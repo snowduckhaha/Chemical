@@ -4,7 +4,7 @@ export const useSiteStore = defineStore("site", {
   state: () => ({
     lang: "zh" as "zh" | "en",
     companyName: "深圳市起点化工有限公司",
-    companyNameEn: "Shenzhen Qidian Chemical Co., Ltd.",
+    companyNameEn: "Shenzhen Origin Chemical Industry Co., Ltd.",
     primaryColor: "#0b4da2"
   }),
   actions: {

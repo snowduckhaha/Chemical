@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getCategories, getProducts, getSeries } from "../api/site";
 import {
@@ -90,7 +90,8 @@ const loadPage = async () => {
       categorySlug.value;
     seriesInfo.value = seriesList.find((item) => item.slug === seriesSlug.value);
     products.value = productList;
-  } catch {
+  } catch (error) {
+    if (import.meta.env.SSR) throw error;
     categoryName.value = categorySlug.value;
     seriesInfo.value = undefined;
     products.value = [];
@@ -100,6 +101,7 @@ const loadPage = async () => {
 };
 
 onMounted(loadPage);
+onServerPrefetch(loadPage);
 watch([lang, categorySlug, seriesSlug], loadPage);
 </script>
 

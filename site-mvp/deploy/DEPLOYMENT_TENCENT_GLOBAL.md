@@ -434,3 +434,4 @@ HTTPS 证书由腾讯云 CDN 托管，到期前 CDN 控制台会提醒续期。�
 - 本阶段本地备份仍受同一台服务器故障影响；腾讯云快照与人工离线下载只能降低风险，不能替代后期 COS 异地备份。
 - 当前上传图片存储在文件系统，并非 MySQL BLOB；生产通过宿主机目录挂载保持持久化。
 - 服务器 IP 或域名变更后，须重新检查 DNS、CDN 回源地址、`SITE_DOMAIN` 与健康检查地址。
+> **当前发布方式（2026-08）**：以 [PRODUCTION_SOURCE_BUILD.md](PRODUCTION_SOURCE_BUILD.md) 为准。生产服务器拉取 `origin/main` 后在本机 Docker 中构建后端与 Vite-SSG；不再使用 GHCR 镜像或 GitHub Actions self-hosted runner。本文中与 GHCR/CI 镜像发布有关的旧说明不再适用。

@@ -2,6 +2,7 @@
 账号.txt
 .env
 .env.*
+.deployed-commit
 !.env.example
 !site-mvp/deploy/.env.production.example
 *.pem

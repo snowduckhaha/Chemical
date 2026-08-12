@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getCategories } from "../api/site";
 import type { Category } from "../types/site";
@@ -200,7 +200,8 @@ const loadPage = async () => {
   loading.value = true;
   try {
     categories.value = await getCategories(lang.value);
-  } catch {
+  } catch (error) {
+    if (import.meta.env.SSR) throw error;
     categories.value = [];
   } finally {
     loading.value = false;
@@ -208,6 +209,7 @@ const loadPage = async () => {
 };
 
 onMounted(loadPage);
+onServerPrefetch(loadPage);
 watch(lang, loadPage);
 </script>
 

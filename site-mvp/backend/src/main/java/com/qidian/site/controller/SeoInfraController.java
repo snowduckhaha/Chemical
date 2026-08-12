@@ -6,8 +6,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -26,16 +24,13 @@ public class SeoInfraController {
     public String sitemap() {
         List<String> pathsZh = siteContentService.getSitemapPaths("zh");
         List<String> pathsEn = siteContentService.getSitemapPaths("en");
-        String now = OffsetDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        xml.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
+        xml.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">");
 
         pathsZh.forEach(path -> {
             xml.append("<url>");
-            xml.append("<loc>").append(siteBaseUrl).append(path).append("</loc>");
-            xml.append("<lastmod>").append(now).append("</lastmod>");
+            appendUrl(xml, path, "/zh", "/en");
             xml.append("<changefreq>weekly</changefreq>");
             xml.append("<priority>0.7</priority>");
             xml.append("</url>");
@@ -43,8 +38,7 @@ public class SeoInfraController {
 
         pathsEn.forEach(path -> {
             xml.append("<url>");
-            xml.append("<loc>").append(siteBaseUrl).append(path).append("</loc>");
-            xml.append("<lastmod>").append(now).append("</lastmod>");
+            appendUrl(xml, path, "/en", "/zh");
             xml.append("<changefreq>weekly</changefreq>");
             xml.append("<priority>0.7</priority>");
             xml.append("</url>");
@@ -58,6 +52,29 @@ public class SeoInfraController {
     public String robots() {
         return "User-agent: *\n"
             + "Allow: /\n"
+            + "Disallow: /zh/admin/\n"
+            + "Disallow: /en/admin/\n"
+            + "Disallow: /zh/search\n"
+            + "Disallow: /en/search\n"
+            + "Disallow: /zh/contact/success\n"
+            + "Disallow: /en/contact/success\n"
             + "Sitemap: " + siteBaseUrl + "/sitemap.xml\n";
+    }
+
+    private void appendUrl(StringBuilder xml, String path, String ownLanguagePrefix, String alternateLanguagePrefix) {
+        String alternatePath = alternateLanguagePrefix + path.substring(ownLanguagePrefix.length());
+        xml.append("<loc>").append(escapeXml(siteBaseUrl + path)).append("</loc>");
+        xml.append("<xhtml:link rel=\"alternate\" hreflang=\"")
+            .append("/zh".equals(ownLanguagePrefix) ? "zh-CN" : "en")
+            .append("\" href=\"").append(escapeXml(siteBaseUrl + path)).append("\"/>");
+        xml.append("<xhtml:link rel=\"alternate\" hreflang=\"")
+            .append("/zh".equals(alternateLanguagePrefix) ? "zh-CN" : "en")
+            .append("\" href=\"").append(escapeXml(siteBaseUrl + alternatePath)).append("\"/>");
+        xml.append("<xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"")
+            .append(escapeXml(siteBaseUrl + alternatePath)).append("\"/>");
+    }
+
+    private String escapeXml(String value) {
+        return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }

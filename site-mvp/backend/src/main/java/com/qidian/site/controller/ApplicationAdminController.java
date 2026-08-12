@@ -1,11 +1,14 @@
 package com.qidian.site.controller;
 
 import com.qidian.site.dto.ApiResponse;
+import com.qidian.site.dto.ApplicationAdminDtos.ApplicationUpsertRequest;
 import com.qidian.site.dto.ApplicationAdminDtos.SeriesRelationUpdateRequest;
 import com.qidian.site.service.ApplicationAdminService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,26 @@ public class ApplicationAdminController {
     @GetMapping
     public ApiResponse<?> applications() {
         return ApiResponse.ok(applicationAdminService.listApplications());
+    }
+
+    @PostMapping
+    public ApiResponse<?> createApplication(@Valid @RequestBody ApplicationUpsertRequest request) {
+        return ApiResponse.ok(Map.of("id", applicationAdminService.createApplication(request)));
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<?> updateApplication(
+        @PathVariable long id,
+        @Valid @RequestBody ApplicationUpsertRequest request
+    ) {
+        applicationAdminService.updateApplication(id, request);
+        return ApiResponse.ok(Map.of("id", id, "updated", true));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> deleteApplication(@PathVariable long id) {
+        applicationAdminService.deleteApplication(id);
+        return ApiResponse.ok(Map.of("id", id, "deleted", true));
     }
 
     @GetMapping("/series-options")

@@ -20,6 +20,7 @@
         <p class="nav-group">客户与数据</p>
         <RouterLink :to="`/${lang}/admin/inquiries`"><span aria-hidden="true">✉</span>询盘管理</RouterLink>
         <RouterLink v-if="auth.isAdmin" :to="`/${lang}/admin/analytics`"><span aria-hidden="true">⌁</span>数据概览</RouterLink>
+        <RouterLink v-if="auth.session?.username === 'zelin'" :to="`/${lang}/admin/deployments`"><span aria-hidden="true">⇧</span>发布最新代码</RouterLink>
         <p class="nav-group">账户</p>
         <RouterLink :to="`/${lang}/admin/account/password`"><span aria-hidden="true">⚿</span>修改密码</RouterLink>
       </nav>

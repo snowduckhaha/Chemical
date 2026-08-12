@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,16 +32,19 @@ public class AdminAuthController {
     private final AuthenticationManager authenticationManager;
     private final AdminUserRepository adminUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CsrfTokenRepository csrfTokenRepository;
     private final HttpSessionSecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     public AdminAuthController(
         AuthenticationManager authenticationManager,
         AdminUserRepository adminUserRepository,
-        PasswordEncoder passwordEncoder
+        PasswordEncoder passwordEncoder,
+        CsrfTokenRepository csrfTokenRepository
     ) {
         this.authenticationManager = authenticationManager;
         this.adminUserRepository = adminUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.csrfTokenRepository = csrfTokenRepository;
     }
 
     @PostMapping("/login")
@@ -106,7 +110,8 @@ public class AdminAuthController {
     }
 
     @GetMapping("/csrf")
-    public ApiResponse<Map<String, String>> csrf(CsrfToken token) {
+    public ApiResponse<Map<String, String>> csrf(HttpServletRequest request, HttpServletResponse response) {
+        CsrfToken token = csrfTokenRepository.loadDeferredToken(request, response).get();
         return ApiResponse.ok(Map.of("headerName", token.getHeaderName(), "token", token.getToken()));
     }
 

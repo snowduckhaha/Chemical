@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getCategories, getSeries } from "../api/site";
 import { getFallbackSeriesApplications } from "../data/productFallback";
@@ -75,7 +75,8 @@ const loadPage = async () => {
     const [categories, series] = await Promise.all([getCategories(lang.value), getSeries(lang.value, categorySlug.value)]);
     category.value = categories.find((item) => item.slug === categorySlug.value);
     seriesList.value = series;
-  } catch {
+  } catch (error) {
+    if (import.meta.env.SSR) throw error;
     category.value = undefined;
     seriesList.value = [];
   } finally {
@@ -84,6 +85,7 @@ const loadPage = async () => {
 };
 
 onMounted(loadPage);
+onServerPrefetch(loadPage);
 watch([lang, categorySlug], loadPage);
 </script>
 

@@ -2,6 +2,8 @@ package com.qidian.site;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,6 +51,28 @@ class SiteApiIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    @AfterEach
+    void cleanIntegrationFixtures() {
+        jdbcTemplate.update("""
+            DELETE h FROM inquiry_status_history h
+            JOIN inquiry i ON i.id = h.inquiry_id
+            WHERE i.email LIKE 'it-%@example.com' OR i.inquiry_no LIKE 'INQ-ADMIN-%'
+            """);
+        jdbcTemplate.update("DELETE FROM inquiry WHERE email LIKE 'it-%@example.com' OR inquiry_no LIKE 'INQ-ADMIN-%'");
+        jdbcTemplate.update("DELETE l FROM application_series_link l JOIN application_field a ON a.id = l.application_id WHERE a.slug LIKE 'it-application-%'");
+        jdbcTemplate.update("DELETE FROM application_field WHERE slug LIKE 'it-application-%'");
+        jdbcTemplate.update("DELETE FROM product_image WHERE product_id IN (SELECT id FROM product WHERE category_id IN (SELECT id FROM product_category WHERE " + integrationCategoryPredicate("slug") + "))");
+        jdbcTemplate.update("DELETE FROM product_parameter WHERE product_id IN (SELECT id FROM product WHERE category_id IN (SELECT id FROM product_category WHERE " + integrationCategoryPredicate("slug") + "))");
+        jdbcTemplate.update("DELETE FROM product WHERE category_id IN (SELECT id FROM product_category WHERE " + integrationCategoryPredicate("slug") + ")");
+        jdbcTemplate.update("DELETE FROM product_series_image WHERE series_id IN (SELECT id FROM product_series WHERE category_id IN (SELECT id FROM product_category WHERE " + integrationCategoryPredicate("slug") + "))");
+        jdbcTemplate.update("DELETE FROM product_series WHERE category_id IN (SELECT id FROM product_category WHERE " + integrationCategoryPredicate("slug") + ")");
+        jdbcTemplate.update("DELETE FROM product_category_image WHERE category_id IN (SELECT id FROM product_category WHERE " + integrationCategoryPredicate("slug") + ")");
+        jdbcTemplate.update("DELETE FROM product_category WHERE " + integrationCategoryPredicate("slug"));
+        jdbcTemplate.update("DELETE FROM certificate WHERE certificate_no LIKE 'CERT-IT-%'");
+        jdbcTemplate.update("DELETE FROM admin_user WHERE username LIKE 'upload-it-%' OR username LIKE 'password-it-%'");
+    }
 
     @Test
     void productsCategoriesEndpointShouldReturnPublishedData() throws Exception {
@@ -106,7 +130,7 @@ class SiteApiIntegrationTest {
     @Test
     void inquiryEndpointShouldPersistRecordToDatabase() throws Exception {
         String email = "it-" + UUID.randomUUID() + "@example.com";
-        String body = """
+        String missingCaptchaBody = """
             {
               "lang": "zh",
               "name": "Integration Test",
@@ -120,10 +144,23 @@ class SiteApiIntegrationTest {
             }
             """.formatted(email);
 
+        mockMvc.perform(post("/api/v1/inquiries")
+                .contentType("application/json")
+                .content(missingCaptchaBody))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").value(400))
+            .andExpect(jsonPath("$.message").value("captcha required"));
+
+        MockHttpSession captchaSession = new MockHttpSession();
+        captchaSession.setAttribute("captcha_code", "test4");
+        captchaSession.setAttribute("captcha_ts", System.currentTimeMillis());
+        String body = missingCaptchaBody.replace("\"sourcePage\": \"/zh/contact\"", "\"sourcePage\": \"/zh/contact\",\n  \"captchaCode\": \"test4\"");
+
         MvcResult result = mockMvc.perform(post("/api/v1/inquiries")
+                .session(captchaSession)
                 .contentType("application/json")
                 .content(body))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(jsonPath("$.code").value(0))
             .andExpect(jsonPath("$.data.inquiryId").isNotEmpty())
             .andReturn();
@@ -149,25 +186,67 @@ class SiteApiIntegrationTest {
     }
 
     @Test
-    void authenticatedMultipartUploadMustUseCsrfTokenReturnedByLoginSession() throws Exception {
-        MockHttpSession session = loginAsUniqueAdmin();
+    @WithMockUser(username = "zelin", roles = "ADMIN")
+    void zelinAdminCanCreateDeploymentJob() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/v1/admin/deployments")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"confirmed\":true}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(0))
+            .andExpect(jsonPath("$.data.environment").value("PRODUCTION"))
+            .andExpect(jsonPath("$.data.status").value("QUEUED"))
+            .andReturn();
+        long jobId = objectMapper.readTree(result.getResponse().getContentAsString()).path("data").path("id").asLong();
+        try {
+            mockMvc.perform(get("/api/v1/admin/deployments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].id").value(jobId));
+        } finally {
+            jdbcTemplate.update("DELETE FROM deployment_job WHERE id = ?", jobId);
+        }
+    }
+
+    @Test
+    @WithMockUser(username = "zelin", roles = "ADMIN")
+    void repeatedDeploymentRequestReturnsTheExistingActiveJob() throws Exception {
+        jdbcTemplate.update("""
+            INSERT INTO deployment_job (environment, source_ref, requested_by, status)
+            VALUES ('PRODUCTION', 'origin/main', 'zelin', 'QUEUED')
+            """);
+        Long createdId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
+        long jobId = createdId == null ? 0 : createdId;
+        try {
+            mockMvc.perform(post("/api/v1/admin/deployments")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"confirmed\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(jobId))
+                .andExpect(jsonPath("$.data.status").value("QUEUED"));
+        } finally {
+            jdbcTemplate.update("DELETE FROM deployment_job WHERE id = ?", jobId);
+        }
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void deploymentEndpointShouldBeHiddenFromOtherAdmins() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/deployments"))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
+    void authenticatedMultipartUploadShouldRequireCsrf() throws Exception {
         MockMultipartFile image = new MockMultipartFile(
             "file", "representative.jpg", MediaType.IMAGE_JPEG_VALUE, jpegImageBytes(800, 800)
         );
-
+        MockHttpSession session = loginAsUniqueAdmin();
         mockMvc.perform(multipart("/api/v1/admin/uploads/images")
                 .file(image)
                 .session(session)
-                .param("scene", "CATEGORY"))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.code").value(403));
-
-        CsrfContext csrf = csrfFor(session);
-        mockMvc.perform(multipart("/api/v1/admin/uploads/images")
-                .file(image)
-                .session(session)
-            .cookie(csrf.cookie())
-            .header("X-XSRF-TOKEN", csrf.token())
+            .with(csrf())
                 .param("scene", "CATEGORY"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(0))
@@ -177,6 +256,14 @@ class SiteApiIntegrationTest {
             .andExpect(jsonPath("$.data.displayMode").value("CONTAIN"))
             .andExpect(jsonPath("$.data.canvasRatio").value("4:3"))
             .andExpect(jsonPath("$.data.displayBytes").value(org.hamcrest.Matchers.lessThanOrEqualTo(1024 * 1024)));
+    }
+
+    @Test
+    void csrfEndpointShouldIssueBrowserCookieAndHeaderContract() throws Exception {
+        CsrfContext csrf = csrfFor(loginAsUniqueAdmin());
+        assertThat(csrf.token()).isNotBlank();
+        assertThat(csrf.headerName()).isEqualTo("X-XSRF-TOKEN");
+        assertThat(csrf.cookie().getValue()).isEqualTo(csrf.token());
     }
 
     @Test
@@ -236,7 +323,7 @@ class SiteApiIntegrationTest {
                 .file(invalidFile)
                 .session(session)
             .cookie(csrf.cookie())
-            .header("X-XSRF-TOKEN", csrf.token()))
+            .header(csrf.headerName(), csrf.token()))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.code").value(400))
             .andExpect(jsonPath("$.message").value("invalid image file"));
@@ -279,6 +366,9 @@ class SiteApiIntegrationTest {
               "nameEn": "Test Category",
               "summaryZh": "测试",
               "summaryEn": "test",
+              "imageUrl": "/products/aluminum-hydroxide.jpg",
+              "imageAltZh": "测试分类图片",
+              "imageAltEn": "Test category image",
               "sortOrder": 99,
               "publishStatus": "DRAFT"
             }
@@ -322,6 +412,81 @@ class SiteApiIntegrationTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
+    void existingPublishedCategoryShouldSaveWithoutChanges() throws Exception {
+        String body = """
+            {
+              "slug": "aluminum-hydroxide",
+              "nameZh": "氢氧化铝",
+              "nameEn": "Aluminum Hydroxide",
+              "summaryZh": "环保型功能性无机填料与阻燃原料。",
+              "summaryEn": "Eco-friendly functional inorganic filler and flame retardant.",
+              "imageUrl": "/products/aluminum-hydroxide.jpg",
+              "imageAltZh": "氢氧化铝分类主图",
+              "imageAltEn": "Aluminum hydroxide category image",
+              "sortOrder": 10,
+              "publishStatus": "PUBLISHED"
+            }
+            """;
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/admin/products/categories/1")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(0))
+            .andExpect(jsonPath("$.data.updated").value(true));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void adminApplicationCrudEndpointsShouldWork() throws Exception {
+        String slug = "it-application-" + UUID.randomUUID().toString().substring(0, 8);
+        String createBody = """
+            {
+              "slug": "%s",
+              "nameZh": "集成测试领域",
+              "nameEn": "Integration Test Application",
+              "overviewZh": "初始简介",
+              "overviewEn": "Initial overview",
+              "sortOrder": 990,
+              "publishStatus": "DRAFT"
+            }
+            """.formatted(slug);
+
+        MvcResult createResult = mockMvc.perform(post("/api/v1/admin/applications")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(createBody))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(0))
+            .andReturn();
+        long id = objectMapper.readTree(createResult.getResponse().getContentAsString()).path("data").path("id").asLong();
+
+        String updateBody = createBody
+            .replace("初始简介", "更新后的简介")
+            .replace("Initial overview", "Updated overview")
+            .replace("\"sortOrder\": 990", "\"sortOrder\": 991")
+            .replace("\"publishStatus\": \"DRAFT\"", "\"publishStatus\": \"PUBLISHED\"");
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/admin/applications/{id}", id)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateBody))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.updated").value(true));
+        jdbcTemplate.update("INSERT INTO application_series_link (application_id, series_id, sort_order, publish_status) VALUES (?, 11, 10, 'PUBLISHED')", id);
+
+        mockMvc.perform(delete("/api/v1/admin/applications/{id}", id).with(csrf()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.deleted").value(true));
+        assertThat(jdbcTemplate.queryForObject("SELECT deleted_at IS NULL FROM application_field WHERE id = ?", Boolean.class, id)).isFalse();
+        assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM application_series_link WHERE application_id = ?", Integer.class, id)).isZero();
+        mockMvc.perform(get("/api/v1/admin/applications"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data[*].id").value(org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem((int) id))));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void adminSeriesAndProductCrudEndpointsShouldWork() throws Exception {
         String categorySlug = "it-parent-" + UUID.randomUUID().toString().substring(0, 8);
         String createCategoryBody = """
@@ -331,6 +496,9 @@ class SiteApiIntegrationTest {
               "nameEn": "Parent Category",
               "summaryZh": "父分类",
               "summaryEn": "parent",
+              "imageUrl": "/products/aluminum-hydroxide.jpg",
+              "imageAltZh": "父分类图片",
+              "imageAltEn": "Parent category image",
               "sortOrder": 88,
               "publishStatus": "PUBLISHED"
             }
@@ -390,6 +558,9 @@ class SiteApiIntegrationTest {
               "nameEn": "Test Series Updated",
               "summaryZh": "系列摘要更新",
               "summaryEn": "series summary updated",
+              "imageUrl": "/uploads/integration/series-preview.jpg",
+              "imageAltZh": "系列预览图",
+              "imageAltEn": "Series preview",
               "sortOrder": 31,
                             "publishStatus": "PUBLISHED"
             }
@@ -545,10 +716,10 @@ class SiteApiIntegrationTest {
         String inquiryNo = "INQ-ADMIN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         jdbcTemplate.update("""
             INSERT INTO inquiry
-            (inquiry_no, lang, name, company, email, phone, country, interested_product, message, source_page, inquiry_status, publish_status)
+            (inquiry_no, lang, name, company, email, phone, country, interested_product, message, source_page, inquiry_status, publish_status, lead_score, lead_level)
             VALUES (?, 'zh', '询盘测试客户', '测试公司', 'inquiry-admin@example.com', '+86 13800000000', '中国',
                     'QD-F02', '这是一条长度超过三十个字符的高意向产品询盘留言，用于验证后台跟进功能。',
-                    '/zh/products/category/series/product', 'NEW', 'PUBLISHED')
+                    '/zh/products/category/series/product', 'NEW', 'PUBLISHED', 60, 'HIGH')
             """, inquiryNo);
         long inquiryId = jdbcTemplate.queryForObject("SELECT id FROM inquiry WHERE inquiry_no = ?", Long.class, inquiryNo);
 
@@ -579,9 +750,8 @@ class SiteApiIntegrationTest {
     @Test
     @WithMockUser(username = "operator", roles = "OPERATOR")
     void inquiryMutationShouldRequireCsrf() throws Exception {
-        Long inquiryId = jdbcTemplate.queryForObject("SELECT id FROM inquiry ORDER BY id LIMIT 1", Long.class);
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put(
-                "/api/v1/admin/inquiries/{id}/status", inquiryId)
+                "/api/v1/admin/inquiries/{id}/status", 999999L)
                 .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"CLOSED\"}"))
             .andExpect(status().isForbidden());
     }
@@ -651,8 +821,8 @@ class SiteApiIntegrationTest {
             .andReturn();
         Cookie cookie = csrfResult.getResponse().getCookie("XSRF-TOKEN");
         assertThat(cookie).as("CSRF endpoint must initialize the XSRF cookie").isNotNull();
-        String token = objectMapper.readTree(csrfResult.getResponse().getContentAsString()).path("data").path("token").asText();
-        return new CsrfContext(token, cookie);
+        JsonNode data = objectMapper.readTree(csrfResult.getResponse().getContentAsString()).path("data");
+        return new CsrfContext(data.path("token").asText(), data.path("headerName").asText(), cookie);
     }
 
     private byte[] jpegImageBytes(int width, int height) throws Exception {
@@ -705,9 +875,20 @@ class SiteApiIntegrationTest {
         assertThat(deleted).isTrue();
     }
 
+    private static String integrationCategoryPredicate(String column) {
+        return "(" + column + " LIKE 'it-cat-%' OR "
+            + column + " LIKE 'it-parent-%' OR "
+            + column + " LIKE 'category-delete-category-%' OR "
+            + column + " LIKE 'series-delete-category-%' OR "
+            + column + " LIKE 'product-delete-category-%' OR "
+            + column + " LIKE 'csrf-delete-category-%' OR "
+            + column + " LIKE 'details-list-category-%' OR "
+            + column + " LIKE 'public-detail-category-%')";
+    }
+
     private record ProductHierarchy(long categoryId, long seriesId, long productId) {
     }
 
-    private record CsrfContext(String token, Cookie cookie) {
+    private record CsrfContext(String token, String headerName, Cookie cookie) {
     }
 }

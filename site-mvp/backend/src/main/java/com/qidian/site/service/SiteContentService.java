@@ -622,33 +622,58 @@ public class SiteContentService {
             return result.get(0);
         }
 
-        if (pageKey.startsWith("news.detail.")) {
-            String slug = pageKey.substring("news.detail.".length());
-            List<SeoMeta> articleSeo = jdbcTemplate.query("""
-                SELECT slug, title_zh, title_en, summary_zh, summary_en, seo_title, seo_description, cover_image_url
-                FROM news_article
-                WHERE slug = ? AND publish_status = 'PUBLISHED' AND deleted_at IS NULL
-                LIMIT 1
-                """, (rs, rowNum) -> {
-                String title = toText(rs.getString("seo_title"));
-                if (title == null) title = localized(lang, rs.getString("title_zh"), rs.getString("title_en"));
-                String description = toText(rs.getString("seo_description"));
-                if (description == null) description = localized(lang, rs.getString("summary_zh"), rs.getString("summary_en"));
-                String categorySlug = jdbcTemplate.queryForObject("""
-                    SELECT c.slug FROM news_article n JOIN news_category c ON c.id = n.category_id WHERE n.slug = ? LIMIT 1
-                    """, String.class, slug);
-                return new SeoMeta(pageKey, title, description, title, description, rs.getString("cover_image_url"), "/" + lang + "/news/" + categorySlug + "/" + slug);
-            }, slug);
-            if (!articleSeo.isEmpty()) return articleSeo.get(0);
-        }
+        SeoMeta entitySeo = resolveEntitySeo(lang, pageKey);
+        if (entitySeo != null) return entitySeo;
 
         boolean en = "en".equals(lang);
-        String fallbackTitle = en ? "Qidian Chemical" : "起点化工";
+        String fallbackTitle = en ? "Origin Chemical" : "起点化工";
         String fallbackDescription = en
             ? "B2B material supplier for ATH, nano alumina and related product lines."
             : "面向 B2B 客户提供 ATH、纳米氧化铝等材料解决方案。";
         String fallbackCanonical = "/" + lang + "/" + ("home".equals(pageKey) ? "" : pageKey);
         return new SeoMeta(pageKey, fallbackTitle, fallbackDescription, fallbackTitle, fallbackDescription, null, fallbackCanonical);
+    }
+
+    /** Resolves concrete public entities without trusting administrator-entered JSON. */
+    private SeoMeta resolveEntitySeo(String lang, String pageKey) {
+        String[] key = pageKey.split("\\.");
+        if (key.length < 3) return null;
+        String sql;
+        Object[] args;
+        String canonical;
+        if (pageKey.startsWith("products.category.") && key.length == 3) {
+            sql = "SELECT name_zh, name_en, summary_zh, summary_en, seo_title, seo_description, NULL AS image FROM product_category WHERE slug = ? AND publish_status = 'PUBLISHED' AND deleted_at IS NULL";
+            args = new Object[] { key[2] };
+            canonical = "/" + lang + "/products/" + key[2];
+        } else if (pageKey.startsWith("products.series.") && key.length == 4) {
+            sql = "SELECT s.name_zh, s.name_en, s.summary_zh, s.summary_en, s.seo_title, s.seo_description, NULL AS image FROM product_series s JOIN product_category c ON c.id = s.category_id WHERE c.slug = ? AND s.slug = ? AND c.publish_status = 'PUBLISHED' AND s.publish_status = 'PUBLISHED' AND c.deleted_at IS NULL AND s.deleted_at IS NULL";
+            args = new Object[] { key[2], key[3] };
+            canonical = "/" + lang + "/products/" + key[2] + "/" + key[3];
+        } else if (pageKey.startsWith("products.detail.") && key.length == 5) {
+            sql = "SELECT p.name_zh, p.name_en, p.summary_zh, p.summary_en, p.seo_title, p.seo_description, m.storage_url AS image FROM product p JOIN product_category c ON c.id = p.category_id JOIN product_series s ON s.id = p.series_id LEFT JOIN product_image pi ON pi.product_id = p.id AND pi.publish_status = 'PUBLISHED' LEFT JOIN media_asset m ON m.id = pi.media_id WHERE c.slug = ? AND s.slug = ? AND p.slug = ? AND c.publish_status = 'PUBLISHED' AND s.publish_status = 'PUBLISHED' AND p.publish_status = 'PUBLISHED' AND c.deleted_at IS NULL AND s.deleted_at IS NULL AND p.deleted_at IS NULL";
+            args = new Object[] { key[2], key[3], key[4] };
+            canonical = "/" + lang + "/products/" + key[2] + "/" + key[3] + "/" + key[4];
+        } else if (pageKey.startsWith("news.detail.") && key.length == 4) {
+            sql = "SELECT n.title_zh AS name_zh, n.title_en AS name_en, n.summary_zh, n.summary_en, n.seo_title, n.seo_description, n.cover_image_url AS image FROM news_article n JOIN news_category c ON c.id = n.category_id WHERE c.slug = ? AND n.slug = ? AND c.publish_status = 'PUBLISHED' AND n.publish_status = 'PUBLISHED' AND c.deleted_at IS NULL AND n.deleted_at IS NULL";
+            args = new Object[] { key[2], key[3] };
+            canonical = "/" + lang + "/news/" + key[2] + "/" + key[3];
+        } else if (pageKey.startsWith("news.category.") && key.length == 3) {
+            sql = "SELECT name_zh, name_en, NULL AS summary_zh, NULL AS summary_en, NULL AS seo_title, NULL AS seo_description, NULL AS image FROM news_category WHERE slug = ? AND publish_status = 'PUBLISHED' AND deleted_at IS NULL";
+            args = new Object[] { key[2] };
+            canonical = "/" + lang + "/news/" + key[2];
+        } else if (pageKey.startsWith("applications.detail.") && key.length == 3) {
+            sql = "SELECT name_zh, name_en, overview_zh AS summary_zh, overview_en AS summary_en, NULL AS seo_title, NULL AS seo_description, NULL AS image FROM application_field WHERE slug = ? AND publish_status = 'PUBLISHED' AND deleted_at IS NULL";
+            args = new Object[] { key[2] };
+            canonical = "/" + lang + "/applications/" + key[2];
+        } else {
+            return null;
+        }
+        List<SeoMeta> values = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            String title = firstNonBlank(toText(rs.getString("seo_title")), localized(lang, rs.getString("name_zh"), rs.getString("name_en")));
+            String description = firstNonBlank(toText(rs.getString("seo_description")), localized(lang, rs.getString("summary_zh"), rs.getString("summary_en")), title);
+            return new SeoMeta(pageKey, title, description, title, description, rs.getString("image"), canonical);
+        }, args);
+        return values.isEmpty() ? null : values.get(0);
     }
 
     public String createInquiryId() {

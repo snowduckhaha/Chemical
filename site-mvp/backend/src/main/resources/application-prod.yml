@@ -9,3 +9,6 @@ logging:
   level:
     root: info
     com.qidian.site: info
+
+deployment:
+  callback-token: ${DEPLOYMENT_CALLBACK_TOKEN:}

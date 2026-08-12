@@ -8,7 +8,7 @@ spring:
     active: dev
 
 site:
-  base-url: http://localhost:5173
+  base-url: ${SITE_BASE_URL:http://127.0.0.1:5175}
   auth:
     initial-admin-username: ${SITE_ADMIN_USERNAME:}
     initial-admin-password-hash: ${SITE_ADMIN_PASSWORD_HASH:}

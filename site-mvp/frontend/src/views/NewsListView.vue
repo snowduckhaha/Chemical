@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, onServerPrefetch, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getNews, getNewsCategories } from "../api/site";
 import type { News, NewsCategory } from "../types/site";
@@ -35,10 +35,12 @@ const goToCategory = (event: Event) => {
   if (categorySlug) void router.push(`/${lang}/news/${categorySlug}`);
 };
 
-onMounted(async () => {
+const load = async () => {
   try { const [allNews, categoryData] = await Promise.all([getNews(lang), getNewsCategories(lang)]); newsList.value = allNews; categories.value = categoryData; }
-  catch { error.value = true; } finally { loading.value = false; }
-});
+  catch (loadError) { if (import.meta.env.SSR) throw loadError; error.value = true; } finally { loading.value = false; }
+};
+onMounted(load);
+onServerPrefetch(load);
 </script>
 
 <style scoped>

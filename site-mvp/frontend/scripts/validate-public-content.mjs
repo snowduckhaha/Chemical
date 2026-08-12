@@ -45,10 +45,18 @@ for (const category of categories) {
   }
 }
 
+const applications = await api(`/applications?lang=${lang}`);
+for (const application of applications) {
+  await checkAsset(application.image, `application ${application.slug}`);
+  routes.add(`/${lang}/applications/${application.slug}`);
+  if (!application.faqs?.length) failures.push(`application ${application.slug}: no visible FAQ entries`);
+}
+
 const news = await api(`/news?lang=${lang}`);
 for (const article of news) {
   await checkAsset(article.coverImage, `news ${article.slug}`);
-  routes.add(`/${lang}/news/${article.slug}`);
+  if (!article.categorySlug) failures.push(`news ${article.slug}: missing category slug`);
+  else routes.add(`/${lang}/news/${article.categorySlug}/${article.slug}`);
 }
 
 const certificates = await api(`/certificates?lang=${lang}`);
@@ -74,10 +82,14 @@ for (const route of routes) {
     .filter((image) => !image.complete || image.naturalWidth === 0 || image.naturalHeight === 0)
     .map((image) => ({ src: image.currentSrc || image.src, alt: image.alt })));
   for (const image of brokenImages) failures.push(`${route}: broken DOM image ${image.src} (alt=${image.alt})`);
+  const emptyAlt = await page.locator("img").evaluateAll((images) => images
+    .filter((image) => image.getAttribute("aria-hidden") !== "true" && !image.closest('[aria-hidden="true"]') && image.alt.trim() === "")
+    .map((image) => image.currentSrc || image.src));
+  for (const image of emptyAlt) failures.push(`${route}: non-decorative image has empty alt (${image})`);
 }
 
 await browser.close();
-console.log(`Validated ${categories.length} categories, ${news.length} news articles, ${certificates.length} certificates, ${checkedAssets.size} unique images and ${routes.size} public routes.`);
+console.log(`Validated ${categories.length} categories, ${applications.length} applications, ${news.length} news articles, ${certificates.length} certificates, ${checkedAssets.size} unique images and ${routes.size} public routes.`);
 if (failures.length) {
   console.error(`Public content validation failed (${failures.length}):`);
   failures.forEach((failure) => console.error(`- ${failure}`));

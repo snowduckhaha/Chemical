@@ -1,0 +1,26 @@
+[Unit]
+Description=Qidian CMS production deployment agent
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/chemical/app/site-mvp
+Environment=DEPLOY_APP_DIR=/opt/chemical/app/site-mvp
+Environment=DEPLOY_ENVIRONMENT=PRODUCTION
+Environment=DEPLOY_LOG_DIR=/opt/chemical/deployer-logs
+Environment=DEPLOY_POLL_SECONDS=1200
+RuntimeDirectory=qidian-deployment-agent
+RuntimeDirectoryMode=0750
+# flock holds this lock for the full agent lifetime. It prevents a second
+# manually started copy from consuming the same publish queue.
+ExecStart=/usr/bin/flock -n /run/qidian-deployment-agent/agent.lock /usr/bin/env bash /opt/chemical/app/site-mvp/deploy/deployer/deployment-agent.sh
+Restart=always
+RestartSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

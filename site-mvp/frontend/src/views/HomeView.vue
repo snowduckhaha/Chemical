@@ -138,13 +138,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getApplications, getCategories, getHome, getNews } from "../api/site";
 import type { Application, HomeSection, Category, News } from "../types/site";
+import { useJsonLd } from "../composables/useJsonLd";
+import { organizationSchema, webSiteSchema } from "../lib/jsonLd";
 
 const route = useRoute();
 const lang = computed(() => String(route.params.lang || "zh"));
+useJsonLd(computed(() => [organizationSchema(lang.value), webSiteSchema(lang.value)]));
 const homeSection = ref<HomeSection>();
 const categories = ref<Category[]>([]);
 const newsList = ref<News[]>([]);
@@ -256,7 +259,8 @@ const loadPage = async () => {
     categories.value = categoryData;
     newsList.value = newsData;
     applications.value = applicationData;
-  } catch {
+  } catch (error) {
+    if (import.meta.env.SSR) throw error;
     homeSection.value = fallbackHome(lang.value);
     categories.value = fallbackCategories(lang.value);
     newsList.value = [];
@@ -272,6 +276,7 @@ const loadPage = async () => {
 };
 
 onMounted(loadPage);
+onServerPrefetch(async () => { await loadPage(); if (slideTimer) { clearInterval(slideTimer); slideTimer = undefined; } });
 watch(lang, loadPage);
 
 onUnmounted(() => {

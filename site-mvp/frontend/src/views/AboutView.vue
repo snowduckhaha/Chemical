@@ -74,6 +74,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+import { useJsonLd } from "../composables/useJsonLd";
+import { breadcrumbSchema, organizationSchema, siteOrigin } from "../lib/jsonLd";
 
 const route = useRoute();
 const lang = computed(() => (String(route.params.lang || "zh") === "en" ? "en" : "zh"));
@@ -84,12 +86,12 @@ const text = computed(() => {
       breadcrumbHome: "Home",
       breadcrumbCurrent: "Company Profile",
       profileKicker: "INTRODUCTION",
-      profileImageAlt: "Qidian Chemical factory and production environment",
+      profileImageAlt: "Origin Chemical factory and production environment",
       profileTitle: "About Us",
       profileParagraphs: [
-        "Shenzhen Qidian Chemical Co., Ltd. focuses on aluminum hydroxide and related advanced inorganic materials for copper clad laminate and functional material applications. We provide reliable product options and technical support for halogen-free flame retardancy, functional fillers and stable sourcing.",
+        "Shenzhen Origin Chemical Co., Ltd. focuses on aluminum hydroxide and related advanced inorganic materials for copper clad laminate and functional material applications. We provide reliable product options and technical support for halogen-free flame retardancy, functional fillers and stable sourcing.",
         "Our products serve electronic materials, engineering plastics, wire and cable, and functional composite applications. With coordinated manufacturing resources, quality inspection capability and transit warehouse coverage, we help customers reduce sourcing risk and improve material evaluation efficiency.",
-        "For global B2B customers, Qidian Chemical is committed to clear product structures, traceable quality control and timely business response, becoming a long-term partner in flame-retardant and functional inorganic materials."
+        "For global B2B customers, Origin Chemical is committed to clear product structures, traceable quality control and timely business response, becoming a long-term partner in flame-retardant and functional inorganic materials."
       ],
       capabilityTitle: "Material Capability For Stable Sourcing",
       capabilities: [
@@ -118,7 +120,7 @@ const text = computed(() => {
       qualityTitle: "Quality Control And Supply Coordination",
       qualityParagraphs: [
         "We care about continuous stability from production and inspection to delivery. Key indicators such as particle size, whiteness, oil absorption, moisture and sieve residue are used as the basis for quality communication.",
-        "With transit warehouse coverage in Changzhou, Yichun and Dongguan, Qidian Chemical supports faster response for key regional customers while balancing stable supply and delivery efficiency."
+        "With transit warehouse coverage in Changzhou, Yichun and Dongguan, Origin Chemical supports faster response for key regional customers while balancing stable supply and delivery efficiency."
       ],
       qualityTags: ["ISO 9001 / ISO 14001", "3 Transit Warehouses", "Fast Sample Response"],
       ctaTitle: "Need A Material Recommendation For Your Application?",
@@ -175,6 +177,15 @@ const text = computed(() => {
     ctaSecondary: "查看产品"
   };
 });
+
+const pageUrl = computed(() => `${siteOrigin}/${lang.value}/about`);
+useJsonLd(computed(() => [
+  organizationSchema(lang.value),
+  breadcrumbSchema(pageUrl.value, [
+    { name: text.value.breadcrumbHome, url: `${siteOrigin}/${lang.value}` },
+    { name: text.value.breadcrumbCurrent }
+  ])
+]));
 </script>
 
 <style scoped>

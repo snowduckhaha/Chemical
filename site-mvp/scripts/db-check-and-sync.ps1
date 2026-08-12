@@ -4,6 +4,14 @@ $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
 $containerName = 'qidian-mysql'
+$envFile = Join-Path $root '.env'
+$mysqlRootPassword = 'root123456'
+if (Test-Path $envFile) {
+    $configuredPassword = Get-Content $envFile | Where-Object { $_ -match '^MYSQL_ROOT_PASSWORD=' } | Select-Object -First 1
+    if ($configuredPassword) {
+        $mysqlRootPassword = ($configuredPassword -replace '^MYSQL_ROOT_PASSWORD=', '').Trim()
+    }
+}
 $schemaScripts = @(
     '/docker-entrypoint-initdb.d/mvp_schema.sql',
     '/docker-entrypoint-initdb.d/product_center_schema_v2.sql',
@@ -20,7 +28,11 @@ $schemaScripts = @(
     '/docker-entrypoint-initdb.d/V13__repair_seed_media_urls.sql',
     '/docker-entrypoint-initdb.d/V14__application_field_configuration.sql',
     '/docker-entrypoint-initdb.d/V15__seed_initial_news_categories.sql',
-    '/docker-entrypoint-initdb.d/V16__temporary_news_reference_assets.sql'
+    '/docker-entrypoint-initdb.d/V16__temporary_news_reference_assets.sql',
+    '/docker-entrypoint-initdb.d/V18__backfill_seed_category_images.sql',
+    '/docker-entrypoint-initdb.d/V19__deployment_jobs.sql',
+    '/docker-entrypoint-initdb.d/V20__seo_meta_page_brand.sql',
+    '/docker-entrypoint-initdb.d/V21__improve_public_image_alt_text.sql'
 )
 
 function Invoke-MySql {
@@ -29,7 +41,7 @@ function Invoke-MySql {
         [string]$Sql
     )
 
-    docker exec -e MYSQL_PWD=root123456 $containerName mysql -uroot qidian_site -N -e $Sql
+    docker exec -e "MYSQL_PWD=$mysqlRootPassword" $containerName mysql -uroot qidian_site -N -e $Sql
     if ($LASTEXITCODE -ne 0) {
         throw "MySQL command failed: $Sql"
     }
@@ -78,6 +90,7 @@ FROM (
         UNION ALL SELECT 'certificate'
     UNION ALL SELECT 'product_category_image'
   UNION ALL SELECT 'application_series_link'
+  UNION ALL SELECT 'deployment_job'
   UNION ALL SELECT 'content_translation_log'
   UNION ALL SELECT 'inquiry'
     UNION ALL SELECT 'inquiry_status_history'

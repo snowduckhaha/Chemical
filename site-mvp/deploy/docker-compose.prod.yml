@@ -23,7 +23,11 @@ services:
       - private
 
   backend:
-    image: ${BACKEND_IMAGE:-ghcr.io/snowduckhaha/chemical-backend:latest}
+    # Built on this production host from the checked-out commit.
+    image: ${BACKEND_IMAGE:-qidian-site-backend:${BUILD_TAG:-local}}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -32,6 +36,7 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD}
       SITE_BASE_URL: https://${SITE_DOMAIN}
       SERVER_FORWARD_HEADERS_STRATEGY: framework
+      DEPLOYMENT_CALLBACK_TOKEN: ${DEPLOYMENT_CALLBACK_TOKEN}
     depends_on:
       mysql:
         condition: service_healthy
@@ -41,7 +46,15 @@ services:
       - private
 
   frontend:
-    image: ${FRONTEND_IMAGE:-ghcr.io/snowduckhaha/chemical-frontend:latest}
+    image: ${FRONTEND_IMAGE:-qidian-site-frontend:${BUILD_TAG:-local}}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+      # Vite-SSG reads published content directly from backend:8080 here,
+      # never through the public domain or CDN.
+      network: qidian_private
+      args:
+        SSG_API_BASE: http://backend:8080/api/v1
     restart: unless-stopped
     depends_on:
       - backend
@@ -66,4 +79,5 @@ services:
 
 networks:
   private:
+    name: qidian_private
     driver: bridge

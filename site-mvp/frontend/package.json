@@ -5,13 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "collect:ssg-routes": "node ./scripts/collect-ssg-routes.mjs",
+    "test:ssg-routes": "node --test ./scripts/collect-ssg-routes.test.mjs",
+    "build": "npm run collect:ssg-routes && vite-ssg build && node ./scripts/create-admin-shell.mjs",
     "preview": "vite preview",
     "validate:public-content": "node ./scripts/validate-public-content.mjs",
     "capture:banner": "node ./scripts/capture-banner-ready.mjs",
     "capture:target-hero": "node ./scripts/diagnose-banner.mjs capture-target-hero"
   },
   "dependencies": {
+    "@unhead/vue": "^1.11.20",
     "element-plus": "^2.8.4",
     "pinia": "^2.1.7",
     "qidian-site-frontend": "file:",
@@ -22,6 +25,7 @@
     "@vitejs/plugin-vue": "^5.1.4",
     "playwright": "^1.61.1",
     "typescript": "^5.6.3",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vite-ssg": "^0.24.3"
   }
 }

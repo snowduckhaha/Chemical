@@ -7,7 +7,7 @@
             <img src="/products/logo-symbol.png" alt="" class="brand-logo" />
           </span>
           <span class="brand-meta">
-            <span class="brand-title">{{ lang === "zh" ? "起点化工" : "START POINT CHEMICAL" }}</span>
+            <span class="brand-title">{{ lang === "zh" ? "起点化工" : "ORIGIN CHEMICAL" }}</span>
           </span>
         </router-link>
 
@@ -104,7 +104,7 @@
             <span class="footer-logo-symbol-wrap">
               <img src="/products/logo-symbol-footer.png" alt="" class="footer-logo-symbol" />
             </span>
-            <span class="footer-logo-title">{{ lang === "zh" ? "起点化工" : "START POINT CHEMICAL" }}</span>
+            <span class="footer-logo-title">{{ lang === "zh" ? "起点化工" : "ORIGIN CHEMICAL" }}</span>
           </div>
           <p>
             {{
@@ -160,7 +160,7 @@
       </div>
 
       <div class="footer-meta">
-        <span>{{ lang === "zh" ? "©2026 深圳市起点化工有限公司版权所有。" : "©2026 Shenzhen Qidian Chemical Industry Co.,Ltd.. All rights reserved." }}</span>
+        <span>{{ lang === "zh" ? "©2026 深圳市起点化工有限公司版权所有。" : "©2026 Shenzhen Origin Chemical Industry Co., Ltd. All rights reserved." }}</span>
         <span>{{ lang === "zh" ? "隐私协议" : "Privacy Agreement" }}</span>
       </div>
     </footer>
@@ -168,7 +168,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { useSeoDocument } from "./composables/useSeoDocument";
+
+useSeoDocument();
+import { computed, nextTick, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useSiteStore } from "./stores/site";
 import { getApplications, getNav, getNewsCategories } from "./api/site";
@@ -406,6 +409,7 @@ const submitSearch = () => {
 };
 
 onMounted(syncNav);
+onServerPrefetch(syncNav);
 watch(() => route.fullPath, syncNav);
 watch(
   () => route.hash,

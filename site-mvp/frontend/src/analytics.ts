@@ -30,11 +30,14 @@ export function pageKeyFor(route: RouteLocationNormalizedLoaded) {
   if (route.name === "product-category") return `products.category.${p.categorySlug}`;
   if (route.name === "product-series") return `products.series.${p.categorySlug}.${p.seriesSlug}`;
   if (route.name === "product-detail") return `products.detail.${p.categorySlug}.${p.seriesSlug}.${p.productSlug}`;
+  if (route.name === "application-detail") return `applications.detail.${p.applicationSlug}`;
+  if (route.name === "news-category") return `news.category.${p.categorySlug}`;
   if (route.name === "news-detail") return `news.detail.${p.categorySlug}.${p.articleSlug}`;
   return String(route.name || route.path).replaceAll("-", ".");
 }
 
 export function trackEvent(eventName: string, pageKey: string, fields: AnalyticsFields = {}) {
+  if (typeof window === "undefined") return;
   if (localStorage.getItem("qidian_analytics_consent") === "denied" || pageKey.startsWith("admin")) return;
   const query = new URLSearchParams(location.search);
   const body = {

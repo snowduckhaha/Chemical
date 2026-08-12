@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getCertificates } from "../api/site";
 
@@ -77,7 +77,8 @@ const loadCertificates = async () => {
   try {
     const rows = await getCertificates(lang.value);
     publishedCertificates.value = rows.map(item => ({ certificateNo: item.certificate_no, name: item.name, imageUrl: item.image_url, altText: item.alt_text || item.name, sortOrder: item.sort_order }));
-  } catch {
+  } catch (error) {
+    if (import.meta.env.SSR) throw error;
     publishedCertificates.value = [];
   }
 };
@@ -115,6 +116,7 @@ const closePreview = () => {
 };
 
 onMounted(loadCertificates);
+onServerPrefetch(loadCertificates);
 watch(lang, loadCertificates);
 </script>
 

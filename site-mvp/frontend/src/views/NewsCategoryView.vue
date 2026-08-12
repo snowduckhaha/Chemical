@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getLegacyNewsDetail, getNewsCategories, getNewsPageByCategory } from "../api/site";
 import type { NewsPage } from "../types/site";
@@ -17,8 +17,8 @@ const route = useRoute();
 const router = useRouter();
 const lang = computed(() => String(route.params.lang || "zh")); const categorySlug = computed(() => String(route.params.categorySlug || "")); const loading = ref(true); const error = ref(false); const page = ref(1); const newsPage = ref<NewsPage>({ items: [], total: 0, page: 1, pageSize: 8 }); const categoryName = ref(""); const totalPages = computed(() => Math.max(1, Math.ceil(newsPage.value.total / newsPage.value.pageSize)));
 
-const load = async (nextPage = 1) => { loading.value = true; error.value = false; try { const categories = await getNewsCategories(lang.value); const category = categories.find(item => item.slug === categorySlug.value); if (!category) { const legacyArticle = await getLegacyNewsDetail(lang.value, categorySlug.value); await router.replace(`/${lang.value}/news/${legacyArticle.categorySlug}/${legacyArticle.slug}`); return; } const result = await getNewsPageByCategory(lang.value, categorySlug.value, nextPage); categoryName.value = category.name; newsPage.value = result; page.value = result.page; } catch { error.value = true; } finally { loading.value = false; } };
-onMounted(load); watch([lang, categorySlug], () => load(1));
+const load = async (nextPage = 1) => { loading.value = true; error.value = false; try { const categories = await getNewsCategories(lang.value); const category = categories.find(item => item.slug === categorySlug.value); if (!category) { const legacyArticle = await getLegacyNewsDetail(lang.value, categorySlug.value); await router.replace(`/${lang.value}/news/${legacyArticle.categorySlug}/${legacyArticle.slug}`); return; } const result = await getNewsPageByCategory(lang.value, categorySlug.value, nextPage); categoryName.value = category.name; newsPage.value = result; page.value = result.page; } catch (loadError) { if (import.meta.env.SSR) throw loadError; error.value = true; } finally { loading.value = false; } };
+onMounted(load); onServerPrefetch(load); watch([lang, categorySlug], () => load(1));
 </script>
 
 <style scoped>

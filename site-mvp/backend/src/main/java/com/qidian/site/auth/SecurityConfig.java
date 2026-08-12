@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.config.Customizer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -77,27 +79,36 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookiePath("/");
+        return repository;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         DaoAuthenticationProvider authenticationProvider,
         ObjectMapper objectMapper,
-        CorsConfigurationSource corsConfigurationSource
+        CorsConfigurationSource corsConfigurationSource,
+        CsrfTokenRepository csrfTokenRepository
     ) throws Exception {
-        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        csrfTokenRepository.setCookiePath("/");
-
         http
             .authenticationProvider(authenticationProvider)
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
+                // The admin SPA reads the raw token from /auth/csrf and sends it
+                // in the repository's header.  Use the matching non-XOR handler.
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 .ignoringRequestMatchers(
                     "/api/v1/admin/auth/login",
                     "/api/v1/admin/auth/logout",
                     "/api/v1/inquiries",
                     "/api/v1/captcha",
                     "/api/v1/captcha/verify",
-                    "/api/v1/analytics/events"))
+                    "/api/v1/analytics/events",
+                    "/api/v1/internal/deployments/**"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/v1/admin/auth/login").permitAll()

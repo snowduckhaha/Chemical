@@ -77,11 +77,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getCategories, getProductDetail, getSeries } from "../api/site";
 import type { Product, Series } from "../types/site";
 import { trackEvent } from "../analytics";
+import { useJsonLd } from "../composables/useJsonLd";
+import { breadcrumbSchema, productSchema, siteOrigin } from "../lib/jsonLd";
 
 const route = useRoute();
 const lang = computed(() => String(route.params.lang || "zh"));
@@ -97,6 +99,23 @@ const tabs = computed(() => [
   { key: "parameters" as const, label: lang.value === "en" ? "Product Indicators" : "产品指标" },
   { key: "statement" as const, label: lang.value === "en" ? "Disclaimer" : "免责声明" }
 ]);
+
+const pageUrl = computed(() =>
+  `${siteOrigin}/${lang.value}/products/${categorySlug.value}/${seriesSlug.value}/${productSlug.value}`
+);
+useJsonLd(computed(() => {
+  if (!detail.value) return [];
+  return [
+    productSchema(detail.value, pageUrl.value),
+    breadcrumbSchema(pageUrl.value, [
+      { name: lang.value === "en" ? "Home" : "首页", url: `${siteOrigin}/${lang.value}` },
+      { name: lang.value === "en" ? "Products" : "产品中心", url: `${siteOrigin}/${lang.value}/products` },
+      { name: categoryName.value, url: `${siteOrigin}/${lang.value}/products/${categorySlug.value}` },
+      { name: seriesName.value, url: `${siteOrigin}/${lang.value}/products/${categorySlug.value}/${seriesSlug.value}` },
+      { name: detail.value.name }
+    ])
+  ];
+}));
 
 const trackInquiry = () => {
   trackEvent("inquiry_cta_click", "product.detail", {
@@ -124,7 +143,8 @@ const loadPage = async () => {
       categories.find((item) => item.slug === categorySlug.value)?.name ||
       categorySlug.value;
     seriesName.value = (series as Series[]).find((item) => item.slug === seriesSlug.value)?.name || seriesSlug.value;
-  } catch {
+  } catch (error) {
+    if (import.meta.env.SSR) throw error;
     detail.value = undefined;
     categoryName.value = categorySlug.value;
     seriesName.value = seriesSlug.value;
@@ -132,6 +152,7 @@ const loadPage = async () => {
 };
 
 onMounted(loadPage);
+onServerPrefetch(loadPage);
 watch([lang, categorySlug, seriesSlug, productSlug], loadPage);
 </script>
 

@@ -15,8 +15,16 @@ import type {
   Series
 } from "../types/site";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+declare const __SSG_API_BASE__: string;
+
+// The private build endpoint exists only in the SSR bundle.  The client build
+// is constant-folded to the relative public endpoint, so Docker service names
+// and internal ports can never be exposed to visitors.
+const API_BASE = import.meta.env.SSR
+  ? (__SSG_API_BASE__ || "/api/v1")
+  : (import.meta.env.VITE_API_BASE_URL || "/api/v1");
 let csrfToken: string | null = null;
+let csrfHeaderName = "X-XSRF-TOKEN";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const { headers: initialHeaders, ...requestInit } = init || {};
@@ -24,7 +32,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...requestInit,
     headers: {
       "Content-Type": "application/json",
-      ...(csrfToken ? { "X-XSRF-TOKEN": csrfToken } : {}),
+      ...(csrfToken ? { [csrfHeaderName]: csrfToken } : {}),
       ...(initialHeaders || {})
     },
     credentials: "include"
@@ -66,6 +74,7 @@ export const adminChangePassword = (currentPassword: string, newPassword: string
 export const adminCsrf = async () => {
   const token = await request<{ headerName: string; token: string }>("/admin/auth/csrf");
   csrfToken = token.token;
+  csrfHeaderName = token.headerName || csrfHeaderName;
   return token;
 };
 
@@ -89,7 +98,7 @@ export async function adminUploadImage(file: File, scene = "PRODUCT"): Promise<U
     method: "POST",
     body,
     credentials: "include",
-    headers: csrfToken ? { "X-XSRF-TOKEN": csrfToken } : {}
+    headers: csrfToken ? { [csrfHeaderName]: csrfToken } : {}
   });
   const payload = (await response.json()) as ApiResponse<UploadedImage>;
   if (!response.ok || payload.code !== 0) throw new Error(payload.message || `upload failed: ${response.status}`);
@@ -187,6 +196,18 @@ export const adminDeleteSeries = (id: number) =>
   request<{ id: number; deleted: boolean }>(`/admin/products/series/${id}`, { method: "DELETE" });
 
 export const adminListApplications = () => request<Array<Record<string, unknown>>>("/admin/applications");
+export const adminCreateApplication = (body: Record<string, unknown>) =>
+  request<{ id: number }>("/admin/applications", { method: "POST", body: JSON.stringify(body) });
+export const adminUpdateApplication = (id: number, body: Record<string, unknown>) =>
+  request<{ id: number; updated: boolean }>(`/admin/applications/${id}`, { method: "PUT", body: JSON.stringify(body) });
+export const adminDeleteApplication = (id: number) =>
+  request<{ id: number; deleted: boolean }>(`/admin/applications/${id}`, { method: "DELETE" });
+export const adminListDeployments = () => request<Array<Record<string, unknown>>>("/admin/deployments");
+export const adminCreateDeployment = () =>
+  request<Record<string, unknown>>("/admin/deployments", {
+    method: "POST",
+    body: JSON.stringify({ confirmed: true })
+  });
 export const adminApplicationSeriesOptions = () =>
   request<Array<Record<string, unknown>>>("/admin/applications/series-options");
 export const adminGetApplicationSeries = (id: number) =>

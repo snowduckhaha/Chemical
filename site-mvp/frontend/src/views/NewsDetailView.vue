@@ -12,21 +12,38 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getNewsDetail } from "../api/site";
 import type { NewsDetail } from "../types/site";
+import { useJsonLd } from "../composables/useJsonLd";
+import { articleSchema, breadcrumbSchema, siteOrigin } from "../lib/jsonLd";
 
 const route = useRoute();
 const lang = computed(() => String(route.params.lang || "zh"));
 const articleSlug = computed(() => String(route.params.articleSlug || "")); const categorySlug = computed(() => String(route.params.categorySlug || "")); const news = ref<NewsDetail>(); const error = ref(false);
 const safeContent = computed(() => (news.value?.content || "").replace(/<script[\s\S]*?<\/script>|\son\w+\s*=\s*(["']).*?\1/gi, ""));
 
+const pageUrl = computed(() => `${siteOrigin}/${lang.value}/news/${categorySlug.value}/${articleSlug.value}`);
+useJsonLd(computed(() => {
+  if (!news.value) return [];
+  return [
+    articleSchema(news.value, pageUrl.value, lang.value),
+    breadcrumbSchema(pageUrl.value, [
+      { name: lang.value === "en" ? "Home" : "首页", url: `${siteOrigin}/${lang.value}` },
+      { name: lang.value === "en" ? "News" : "资讯中心", url: `${siteOrigin}/${lang.value}/news` },
+      { name: news.value.category, url: `${siteOrigin}/${lang.value}/news/${news.value.categorySlug}` },
+      { name: news.value.title }
+    ])
+  ];
+}));
+
 const loadNews = async () => {
-  error.value = false; news.value = undefined; try { news.value = await getNewsDetail(lang.value, categorySlug.value, articleSlug.value); } catch { error.value = true; }
+  error.value = false; news.value = undefined; try { news.value = await getNewsDetail(lang.value, categorySlug.value, articleSlug.value); } catch (loadError) { if (import.meta.env.SSR) throw loadError; error.value = true; }
 };
 
 onMounted(loadNews);
+onServerPrefetch(loadNews);
 watch([lang, categorySlug, articleSlug], loadNews);
 </script>
 

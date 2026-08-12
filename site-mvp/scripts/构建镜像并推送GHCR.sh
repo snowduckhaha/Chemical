@@ -12,7 +12,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DEPLOY_DIR="$PROJECT_ROOT/deploy"
 
 GHCR_USER="${GHCR_USERNAME:-snowduckhaha}"
-GHCR_TOKEN="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"
+GHCR_TOKEN="${GHCR_TOKEN:-}"
 BACKEND_IMAGE="ghcr.io/$GHCR_USER/chemical-backend:latest"
 FRONTEND_IMAGE="ghcr.io/$GHCR_USER/chemical-frontend:latest"
 

@@ -109,9 +109,9 @@ INSERT INTO news_article (id, category_id, slug, title_zh, title_en, summary_zh,
 
 INSERT INTO seo_meta (entity_type, entity_id, lang, page_key, title, description, canonical, publish_status) VALUES
 ('PAGE', NULL, 'zh', 'home', '先进材料解决方案 | 起点化工', '面向 B2B 客户提供 ATH、硅粉、氧化铝与硅烷偶联剂材料方案。', '/zh/', 'PUBLISHED'),
-('PAGE', NULL, 'en', 'home', 'Advanced Material Solutions | Qidian Chemical', 'B2B material supplier for ATH, silica powder, alumina and silane agents.', '/en/', 'PUBLISHED'),
+('PAGE', NULL, 'en', 'home', 'Advanced Material Solutions | Origin Chemical', 'B2B material supplier for ATH, silica powder, alumina and silane agents.', '/en/', 'PUBLISHED'),
 ('PAGE', NULL, 'zh', 'products', '产品中心 | 起点化工', '阻燃与功能材料产品矩阵。', '/zh/products', 'PUBLISHED'),
-('PAGE', NULL, 'en', 'products', 'Product Center | Qidian Chemical', 'Product matrix for flame-retardant and functional materials.', '/en/products', 'PUBLISHED');
+('PAGE', NULL, 'en', 'products', 'Product Center | Origin Chemical', 'Product matrix for flame-retardant and functional materials.', '/en/products', 'PUBLISHED');
 
 INSERT INTO page_content (page_key, lang, payload_json, publish_status) VALUES
 ('nav', 'zh', '[{"key":"home","label":"首页","path":"/zh"},{"key":"about","label":"关于我们","path":"/zh/about"},{"key":"products","label":"产品中心","path":"/zh/products"},{"key":"applications","label":"应用领域","path":"/zh/applications"},{"key":"news","label":"资讯中心","path":"/zh/news"},{"key":"contact","label":"联系我们","path":"/zh/contact"}]', 'PUBLISHED'),

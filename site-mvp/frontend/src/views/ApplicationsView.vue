@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onServerPrefetch, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getApplications } from "../api/site";
 import { trackEvent } from "../analytics";
@@ -33,7 +33,7 @@ const goTo = (index: number) => { if (!viewport.value || !applications.value.len
 const syncIndex = () => { if (timer) clearTimeout(timer); timer = window.setTimeout(() => { const step = cardStep(); if (step) activeIndex.value = Math.max(0, Math.min(applications.value.length - 1, Math.round((viewport.value?.scrollLeft || 0) / step))); }, 80); };
 const trackCard = (slug: string) => trackEvent("application_card_click", "applications", { payload: { application_slug: slug, position: activeIndex.value + 1 } });
 const load = async () => { loading.value = true; try { applications.value = await getApplications(lang.value); activeIndex.value = 0; await nextTick(); viewport.value?.scrollTo({ left: 0 }); } finally { loading.value = false; } };
-onMounted(load); watch(lang, load); onUnmounted(() => { if (timer) clearTimeout(timer); });
+onMounted(load); onServerPrefetch(load); watch(lang, load); onUnmounted(() => { if (timer) clearTimeout(timer); });
 </script>
 
 <style scoped>
