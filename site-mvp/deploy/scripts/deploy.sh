@@ -35,6 +35,14 @@ RESOLVED_COMMIT="$(git -C "$SOURCE_DIR" rev-parse HEAD)"
 BUILD_TAG="${RESOLVED_COMMIT:0:12}"
 export BUILD_TAG
 
+# The merge above may have replaced this very script. Re-execute the
+# checked-out copy once so the remainder of the deployment always runs the
+# fetched code instead of a process image that git just overwrote.
+if [[ "${DEPLOY_REEXECED:-0}" != "1" ]]; then
+  export DEPLOY_REEXECED=1
+  exec bash "$APP_DIR/deploy/scripts/deploy.sh"
+fi
+
 previous_backend_id="$(docker compose --env-file .env -f "$COMPOSE_FILE" ps -q backend 2>/dev/null || true)"
 previous_frontend_id="$(docker compose --env-file .env -f "$COMPOSE_FILE" ps -q frontend 2>/dev/null || true)"
 previous_backend_image=""
