@@ -1,6 +1,8 @@
 # CDN handles HTTPS termination; this server only accepts HTTP from the CDN origin.
 server {
-    listen 80;
+    # default_server so requests addressed by raw IP (or any unmatched Host)
+    # land here instead of the stock nginx welcome server block.
+    listen 80 default_server;
     server_name ${SITE_DOMAIN} www.${SITE_DOMAIN};
 
     client_max_body_size 4m;

@@ -79,6 +79,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/site.conf.template:/etc/nginx/templates/site.conf.template:ro
+      - ./nginx/blank.conf:/etc/nginx/conf.d/default.conf:ro
       - ${UPLOADS_DIR}:/srv/uploads:ro
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN}
