@@ -72,7 +72,7 @@ docker compose --env-file .env -f "$COMPOSE_FILE" up -d --no-deps --force-recrea
 
 # Wait until the freshly-built backend responds on the private Docker network.
 # The throwaway curl container never uses the public host name or CDN.
-for _ in $(seq 1 24); do
+for _ in $(seq 1 60); do
   if docker run --rm --network qidian_private curlimages/curl:8.10.1 \
     --fail --silent --show-error "http://backend:8080/api/v1/health"; then
     break
@@ -80,7 +80,7 @@ for _ in $(seq 1 24); do
   sleep 5
 done
 docker run --rm --network qidian_private curlimages/curl:8.10.1 \
-  --fail --silent --show-error --retry 3 --retry-delay 5 "http://backend:8080/api/v1/health"
+  --fail --silent --show-error --retry 30 --retry-delay 5 --retry-all-errors "http://backend:8080/api/v1/health"
 
 # The frontend build runs on the host network and reads published content
 # from the loopback-only backend exposure (127.0.0.1:8080). It never touches
@@ -88,8 +88,10 @@ docker run --rm --network qidian_private curlimages/curl:8.10.1 \
 docker compose --env-file .env -f "$COMPOSE_FILE" build frontend
 docker compose --env-file .env -f "$COMPOSE_FILE" up -d --no-build --force-recreate backend frontend gateway
 
-curl --fail --silent --show-error --retry 3 --retry-delay 5 -H "Host: ${SITE_DOMAIN}" "http://127.0.0.1/api/v1/health"
-curl --fail --silent --show-error --retry 3 --retry-delay 5 -H "Host: ${SITE_DOMAIN}" "http://127.0.0.1/zh" >/dev/null
+# After force-recreate the backend needs a cold start; give it up to five
+# minutes before declaring the deployment failed.
+curl --fail --silent --show-error --retry 60 --retry-delay 5 --retry-all-errors -H "Host: ${SITE_DOMAIN}" "http://127.0.0.1/api/v1/health"
+curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors -H "Host: ${SITE_DOMAIN}" "http://127.0.0.1/zh" >/dev/null
 
 docker image prune -f
 trap - ERR
