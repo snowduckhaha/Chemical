@@ -7,14 +7,14 @@
 ```text
 CMS 发布任务 / 手工执行
   -> git fetch + fast-forward origin/main
-  -> 构建后端并启动 backend
-  -> Docker 私网 http://backend:8080/api/v1
+  -> 构建后端并启动 backend（仅向宿主机回环地址暴露 8080）
+  -> 宿主机回环 http://127.0.0.1:8080/api/v1
   -> Vite-SSG 预渲染产品、应用、资讯等公共页
   -> 构建并替换 frontend、gateway
   -> 源站健康检查与 SSG 页面检查
 ```
 
-`SSG_API_BASE` 固定为 `http://backend:8080/api/v1`，仅在 `qidian_private` Docker 网络内解析。它没有经过 CDN，也不会暴露给浏览器；客户端仍使用相对地址 `/api/v1`。
+`SSG_API_BASE` 固定为 `http://127.0.0.1:8080/api/v1`。backend 通过 compose 的 `127.0.0.1:8080:8080` 端口映射仅向宿主机回环地址暴露，前端构建使用 host 网络读取该地址；BuildKit 不支持在构建阶段加入 compose 定义的自定义网络，因此不使用 Docker 私网方案。该地址不经过 CDN，也不对外网开放；客户端仍使用相对地址 `/api/v1`。
 
 ## 服务器准备
 
@@ -42,6 +42,8 @@ MYSQL_BINLOG_RETENTION_SECONDS=1296000
 | `/opt/chemical/uploads` | backend `/app/uploads`；gateway `/srv/uploads`（只读） | 后台上传图片，容器重建后保留 |
 | `/opt/chemical/mysql-data` | mysql `/var/lib/mysql` | MySQL 数据及 binary log，容器重建后保留 |
 | `/opt/chemical/backups` | 不直接挂载 | 周全量基线、每日数据库增量及每日上传图片快照 |
+
+backend 容器的 `127.0.0.1:8080:8080` 端口映射仅绑定宿主机回环地址，供前端 SSG 构建读取发布内容；对外网和 CDN 均不可见，无需在安全组中放行 8080。
 
 首次部署脚本会创建这些目录；MySQL 数据目录应保持 `0700` 且归 MySQL 容器 UID 所有。不要执行 `docker compose down -v`，不要删除 `/opt/chemical/mysql-data`。
 

@@ -35,6 +35,10 @@ services:
       context: ..
       dockerfile: deploy/Dockerfile.backend
     restart: unless-stopped
+    # Loopback-only exposure so the frontend SSG build (host network) can read
+    # published content without exposing the backend to the public interface.
+    ports:
+      - "127.0.0.1:8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       DB_URL: jdbc:mysql://mysql:3306/qidian_site?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
@@ -56,11 +60,12 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.frontend
-      # Vite-SSG reads published content directly from backend:8080 here,
-      # never through the public domain or CDN.
-      network: qidian_private
+      # BuildKit cannot join compose-defined networks during a build, so the
+      # build runs on the host network and reads published content from the
+      # loopback-only backend exposure above. Never through the public domain.
+      network: host
       args:
-        SSG_API_BASE: http://backend:8080/api/v1
+        SSG_API_BASE: http://127.0.0.1:8080/api/v1
     restart: unless-stopped
     depends_on:
       - backend

@@ -82,8 +82,9 @@ done
 docker run --rm --network qidian_private curlimages/curl:8.10.1 \
   --fail --silent --show-error --retry 3 --retry-delay 5 "http://backend:8080/api/v1/health"
 
-# This build is attached to qidian_private by compose. SSG_API_BASE therefore
-# resolves directly to backend:8080 and cannot receive a CDN-cached response.
+# The frontend build runs on the host network and reads published content
+# from the loopback-only backend exposure (127.0.0.1:8080). It never touches
+# the public domain or CDN.
 docker compose --env-file .env -f "$COMPOSE_FILE" build frontend
 docker compose --env-file .env -f "$COMPOSE_FILE" up -d --no-build --force-recreate backend frontend gateway
 

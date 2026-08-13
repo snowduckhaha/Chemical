@@ -11,7 +11,7 @@ export DEPLOY_LOG_DIR=/opt/chemical/deployer-logs
 bash /opt/chemical/app/site-mvp/deploy/deployer/deployment-agent.sh
 ```
 
-For production, the agent loads database settings from `$DEPLOY_APP_DIR/.env`. Keep `DEPLOY_APP_DIR` as the deployed application directory and start one agent only. A `PRODUCTION` job runs the fixed `deploy/scripts/deploy.sh` on this host: it fast-forwards `main`, builds the backend, builds Vite-SSG against `http://backend:8080/api/v1` on the private Docker network, and then recreates the services. The CMS endpoint is restricted to the `zelin` account with the `ADMIN` role; it only creates `PRODUCTION` jobs for `origin/main`. No GitHub Actions runner or GHCR write token is involved. A `LOCAL` job uses the fixed local start/stop scripts.
+For production, the agent loads database settings from `$DEPLOY_APP_DIR/.env`. Keep `DEPLOY_APP_DIR` as the deployed application directory and start one agent only. A `PRODUCTION` job runs the fixed `deploy/scripts/deploy.sh` on this host: it fast-forwards `main`, builds the backend, builds Vite-SSG against `http://127.0.0.1:8080/api/v1` on the host network (loopback-only backend exposure), and then recreates the services. The CMS endpoint is restricted to the `zelin` account with the `ADMIN` role; it only creates `PRODUCTION` jobs for `origin/main`. No GitHub Actions runner or GHCR write token is involved. A `LOCAL` job uses the fixed local start/stop scripts.
 
 Before the first deployment task is created on an existing server, pull this release and apply the additive job-table migration once:
 

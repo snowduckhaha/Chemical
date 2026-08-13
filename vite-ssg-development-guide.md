@@ -51,10 +51,10 @@ Vue 的服务端渲染要求在服务端预取数据并处理客户端 hydration
 
 ### 2.2 环境检查
 
-当前 Docker Compose 中 backend 没有暴露给宿主机。构建器必须运行在同一 Docker 网络，并通过下列内部地址访问：
+生产部署中 backend 仅通过 `127.0.0.1:8080:8080` 端口映射暴露给宿主机回环地址，前端构建使用 host 网络访问。构建器必须通过下列地址访问：
 
 ~~~text
-SSG_API_BASE=http://backend:8080/api/v1
+SSG_API_BASE=http://127.0.0.1:8080/api/v1
 PUBLIC_API_BASE=/api/v1
 SITE_ORIGIN=https://www.origin-chemical.com
 ~~~
@@ -66,8 +66,8 @@ SITE_ORIGIN=https://www.origin-chemical.com
 ~~~bash
 node --version
 npm --version
-curl -fsS http://backend:8080/api/v1/products/categories?lang=en
-curl -fsS http://backend:8080/api/v1/news?lang=en
+curl -fsS http://127.0.0.1:8080/api/v1/products/categories?lang=en
+curl -fsS http://127.0.0.1:8080/api/v1/news?lang=en
 ~~~
 
 ### 2.3 一键发布专属账号
@@ -340,7 +340,7 @@ Dockerfile 的 frontend 构建阶段不能可靠访问运行中的 backend 数�
 推荐方式：
 
 1. CI 构建并签名固定版本的前端构建器镜像；
-2. 生产环境启动 backend 后，私有网络内的 ssg-builder job 使用 SSG_API_BASE=http://backend:8080/api/v1；
+2. 生产环境启动 backend 后，前端构建阶段（host 网络）使用 SSG_API_BASE=http://127.0.0.1:8080/api/v1；
 3. builder 输出到不可变 releases/{build-id}；
 4. 对候选版本执行静态和 HTTP 验证；
 5. 仅验证通过后，原子切换 current 指针或网关挂载；
