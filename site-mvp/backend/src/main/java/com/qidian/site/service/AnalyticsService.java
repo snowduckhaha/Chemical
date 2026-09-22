@@ -81,11 +81,66 @@ public class AnalyticsService {
     }
 
     public List<Map<String, Object>> funnel(String from, String to, String lang, String channel) {
-        QueryFilter filter = filter(from, to, lang, channel, "occurred_at");
+        QueryFilter productFilter = filter(from, to, lang, channel, "occurred_at");
+        QueryFilter ctaFilter = filter(from, to, lang, channel, "c.occurred_at");
+        QueryFilter formFilter = filter(from, to, lang, channel, "f.occurred_at");
+        QueryFilter submitFilter = filter(from, to, lang, channel, "s.occurred_at");
         List<Map<String, Object>> rows = new ArrayList<>();
+        List<Long> counts = List.of(
+            count("SELECT COUNT(DISTINCT session_id) FROM analytics_event WHERE event_name = 'product_view' AND session_id IS NOT NULL" + productFilter.sql(), productFilter.args()),
+            count("""
+                SELECT COUNT(DISTINCT c.session_id) FROM analytics_event c
+                WHERE c.event_name = 'inquiry_cta_click' AND c.session_id IS NOT NULL
+                  AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(c.payload_json, '$.cta_key')), '') <> 'contact_submit'
+                """ + ctaFilter.sql() + """
+                  AND EXISTS (
+                    SELECT 1 FROM analytics_event p
+                    WHERE p.event_name = 'product_view' AND p.session_id = c.session_id
+                      AND p.occurred_at <= c.occurred_at
+                  )
+                """, ctaFilter.args()),
+            count("""
+                SELECT COUNT(DISTINCT f.session_id) FROM analytics_event f
+                WHERE f.event_name = 'inquiry_form_open' AND f.session_id IS NOT NULL
+                """ + formFilter.sql() + """
+                  AND EXISTS (
+                    SELECT 1 FROM analytics_event c
+                    WHERE c.event_name = 'inquiry_cta_click' AND c.session_id = f.session_id
+                      AND c.occurred_at <= f.occurred_at
+                      AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(c.payload_json, '$.cta_key')), '') <> 'contact_submit'
+                      AND EXISTS (
+                        SELECT 1 FROM analytics_event p
+                        WHERE p.event_name = 'product_view' AND p.session_id = c.session_id
+                          AND p.occurred_at <= c.occurred_at
+                      )
+                  )
+                """, formFilter.args()),
+            count("""
+                SELECT COUNT(DISTINCT s.session_id) FROM analytics_event s
+                WHERE s.event_name = 'inquiry_submit_success' AND s.session_id IS NOT NULL
+                """ + submitFilter.sql() + """
+                  AND EXISTS (
+                    SELECT 1 FROM analytics_event f
+                    WHERE f.event_name = 'inquiry_form_open' AND f.session_id = s.session_id
+                      AND f.occurred_at <= s.occurred_at
+                      AND EXISTS (
+                        SELECT 1 FROM analytics_event c
+                        WHERE c.event_name = 'inquiry_cta_click' AND c.session_id = f.session_id
+                          AND c.occurred_at <= f.occurred_at
+                          AND COALESCE(JSON_UNQUOTE(JSON_EXTRACT(c.payload_json, '$.cta_key')), '') <> 'contact_submit'
+                          AND EXISTS (
+                            SELECT 1 FROM analytics_event p
+                            WHERE p.event_name = 'product_view' AND p.session_id = c.session_id
+                              AND p.occurred_at <= c.occurred_at
+                          )
+                      )
+                  )
+                """, submitFilter.args())
+        );
         long previous = 0;
+        int index = 0;
         for (String event : List.of("product_view", "inquiry_cta_click", "inquiry_form_open", "inquiry_submit_success")) {
-            long value = count("SELECT COUNT(*) FROM analytics_event WHERE event_name = ?" + filter.sql(), prepend(event, filter.args()));
+            long value = counts.get(index++);
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("eventName", event); row.put("count", value); row.put("conversionRate", previous == 0 ? (rows.isEmpty() ? 100 : 0) : value * 100.0 / previous);
             rows.add(row); previous = value;
@@ -164,10 +219,6 @@ public class AnalyticsService {
     private long count(String sql, List<Object> args) {
         Long value = jdbcTemplate.queryForObject(sql, Long.class, args.toArray());
         return value == null ? 0 : value;
-    }
-
-    private List<Object> prepend(Object first, List<Object> rest) {
-        List<Object> args = new ArrayList<>(); args.add(first); args.addAll(rest); return args;
     }
 
     private String classify(String medium, String referrer) {

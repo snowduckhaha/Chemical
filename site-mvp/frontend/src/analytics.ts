@@ -4,6 +4,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
 const SESSION_TTL = 30 * 60 * 1000;
 
 type AnalyticsFields = Record<string, unknown>;
+type InquiryCtaPayload = Record<string, unknown>;
 
 function randomId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -53,6 +54,11 @@ export function trackEvent(eventName: string, pageKey: string, fields: Analytics
     if (navigator.sendBeacon && navigator.sendBeacon(`${API_BASE}/analytics/events`, new Blob([json], { type: "application/json" }))) return;
     void fetch(`${API_BASE}/analytics/events`, { method: "POST", headers: { "Content-Type": "application/json" }, body: json, keepalive: true }).catch(() => undefined);
   } catch { /* Analytics must never block business actions. */ }
+}
+
+/** Keep every visible inquiry entry point in one analytics vocabulary. */
+export function trackInquiryCta(pageKey: string, payload: InquiryCtaPayload) {
+  trackEvent("inquiry_cta_click", pageKey, { payload });
 }
 
 export function trackPageView(route: RouteLocationNormalizedLoaded) {

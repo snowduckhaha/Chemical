@@ -64,6 +64,7 @@ const route = useRoute();
 const router = useRouter();
 const lang = computed(() => String(route.params.lang || "zh"));
 const applicationSlug = computed(() => typeof route.query.application === "string" ? route.query.application : "");
+const inquirySource = computed(() => typeof route.query.source === "string" ? route.query.source : "");
 
 const submitting = ref(false);
 const errorMessage = ref("");
@@ -101,7 +102,6 @@ const submit = async () => {
 
   submitting.value = true;
   try {
-    trackEvent("inquiry_cta_click", "contact", { payload: { cta_key: "contact_submit", cta_position: "contact_form" } });
     const result = await createInquiry({
       lang: lang.value,
       name: form.name,
@@ -131,7 +131,13 @@ const submit = async () => {
   }
 };
 
-onMounted(() => trackEvent("inquiry_form_open", "contact", { payload: { form_key: "contact", open_method: "page" } }));
+onMounted(() => trackEvent("inquiry_form_open", "contact", {
+  payload: {
+    form_key: "contact",
+    open_method: inquirySource.value ? "cta" : "direct",
+    cta_source: inquirySource.value || undefined
+  }
+}));
 </script>
 
 <style scoped>

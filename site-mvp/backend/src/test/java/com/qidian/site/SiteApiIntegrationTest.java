@@ -24,6 +24,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +57,7 @@ class SiteApiIntegrationTest {
     @BeforeEach
     @AfterEach
     void cleanIntegrationFixtures() {
+        jdbcTemplate.update("DELETE FROM analytics_event WHERE visitor_id LIKE 'it-funnel-%'");
         jdbcTemplate.update("""
             DELETE h FROM inquiry_status_history h
             JOIN inquiry i ON i.id = h.inquiry_id
@@ -125,6 +128,44 @@ class SiteApiIntegrationTest {
         mockMvc.perform(get("/api/v1/news/events/ath-flame-retardant-advantages").param("lang", "zh"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value(404));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void funnelShouldOnlyCountOrderedStepsInTheSameSession() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        String completed = "it-funnel-completed-" + UUID.randomUUID();
+        String outOfOrder = "it-funnel-out-of-order-" + UUID.randomUUID();
+        String legacySubmit = "it-funnel-legacy-submit-" + UUID.randomUUID();
+        String directForm = "it-funnel-direct-form-" + UUID.randomUUID();
+
+        insertAnalyticsEvent(completed, "product_view", now.minusMinutes(4), "{}");
+        insertAnalyticsEvent(completed, "inquiry_cta_click", now.minusMinutes(3), "{\"cta_key\":\"product_inquiry\"}");
+        insertAnalyticsEvent(completed, "inquiry_form_open", now.minusMinutes(2), "{\"open_method\":\"cta\"}");
+        insertAnalyticsEvent(completed, "inquiry_submit_success", now.minusMinutes(1), "{}");
+
+        insertAnalyticsEvent(outOfOrder, "inquiry_cta_click", now.minusMinutes(4), "{\"cta_key\":\"product_inquiry\"}");
+        insertAnalyticsEvent(outOfOrder, "product_view", now.minusMinutes(3), "{}");
+        insertAnalyticsEvent(legacySubmit, "product_view", now.minusMinutes(3), "{}");
+        insertAnalyticsEvent(legacySubmit, "inquiry_cta_click", now.minusMinutes(2), "{\"cta_key\":\"contact_submit\"}");
+        insertAnalyticsEvent(directForm, "inquiry_form_open", now.minusMinutes(1), "{\"open_method\":\"direct\"}");
+
+        String date = LocalDate.now().toString();
+        mockMvc.perform(get("/api/v1/admin/analytics/funnel").param("from", date).param("to", date))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data[0].count").value(3))
+            .andExpect(jsonPath("$.data[1].count").value(1))
+            .andExpect(jsonPath("$.data[2].count").value(1))
+            .andExpect(jsonPath("$.data[3].count").value(1));
+    }
+
+    private void insertAnalyticsEvent(String sessionId, String eventName, LocalDateTime occurredAt, String payload) {
+        jdbcTemplate.update("""
+            INSERT INTO analytics_event
+            (event_id, event_name, occurred_at, visitor_id, session_id, page_key, page_path, page_type,
+             source_channel, lang, payload_json)
+            VALUES (?, ?, ?, ?, ?, 'products.detail.test', '/zh/products/test', 'product-detail', 'DIRECT', 'zh', CAST(? AS JSON))
+            """, UUID.randomUUID().toString(), eventName, occurredAt, sessionId, sessionId, payload);
     }
 
     @Test

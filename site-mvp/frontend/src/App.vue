@@ -85,7 +85,7 @@
               <button class="search-close" type="button" @click="closeSearch" :aria-label="lang === 'zh' ? '关闭搜索' : 'Close search'">✕</button>
             </div>
           </div>
-          <router-link class="quote-btn" :to="`/${lang}/contact`">{{ lang === "zh" ? "索取报价" : "Get Quote" }}</router-link>
+          <router-link class="quote-btn" :to="`/${lang}/contact?source=header-quote`" @click="trackHeaderInquiry">{{ lang === "zh" ? "索取报价" : "Get Quote" }}</router-link>
           <button class="mobile-menu-btn" type="button" :aria-expanded="mobileNavOpen" :aria-label="lang === 'zh' ? '切换导航菜单' : 'Toggle navigation'" @click="mobileNavOpen = !mobileNavOpen">
             <span></span><span></span><span></span>
           </button>
@@ -177,6 +177,7 @@ import { useSiteStore } from "./stores/site";
 import { getApplications, getNav, getNewsCategories } from "./api/site";
 import type { Application, NavItem, NewsCategory } from "./types/site";
 import type { NavMegaDropdownItem } from "./plugins/navMegaDropdown";
+import { trackInquiryCta } from "./analytics";
 
 const route = useRoute();
 const router = useRouter();
@@ -400,6 +401,11 @@ const closeSearch = () => {
   searchOpen.value = false;
   searchKeyword.value = "";
 };
+
+const trackHeaderInquiry = () => trackInquiryCta(String(route.name || "header"), {
+  cta_key: "header_quote",
+  cta_position: "header"
+});
 
 const submitSearch = () => {
   const keyword = searchKeyword.value.trim();

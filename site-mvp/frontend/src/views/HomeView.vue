@@ -122,7 +122,7 @@
           }}
         </p>
       </div>
-      <router-link class="cta-link" :to="`/${lang}/contact`">{{ lang === "en" ? "Discuss Your Project" : "讨论你的项目" }} <span>→</span></router-link>
+      <router-link class="cta-link" :to="`/${lang}/contact?source=home-project-cta`" @click="trackInquiry">{{ lang === "en" ? "Discuss Your Project" : "讨论你的项目" }} <span>→</span></router-link>
     </section>
 
     <section class="news-section">
@@ -144,6 +144,7 @@ import { getApplications, getCategories, getHome, getNews } from "../api/site";
 import type { Application, HomeSection, Category, News } from "../types/site";
 import { useJsonLd } from "../composables/useJsonLd";
 import { organizationSchema, webSiteSchema } from "../lib/jsonLd";
+import { trackInquiryCta } from "../analytics";
 
 const route = useRoute();
 const lang = computed(() => String(route.params.lang || "zh"));
@@ -153,6 +154,10 @@ const categories = ref<Category[]>([]);
 const newsList = ref<News[]>([]);
 const applications = ref<Application[]>([]);
 const activeSlide = ref(0);
+const trackInquiry = () => trackInquiryCta("home", {
+  cta_key: "home_project",
+  cta_position: "home_project_cta"
+});
 
 const displayCategories = computed(() => {
   const source = [...categories.value];

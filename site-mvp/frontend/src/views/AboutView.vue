@@ -63,7 +63,7 @@
           <p>{{ text.ctaDescription }}</p>
         </div>
         <div class="cta-actions">
-          <router-link class="cta-primary" :to="`/${lang}/contact`">{{ text.ctaPrimary }}</router-link>
+          <router-link class="cta-primary" :to="`/${lang}/contact?source=about-cta`" @click="trackInquiry">{{ text.ctaPrimary }}</router-link>
           <router-link class="cta-secondary" :to="`/${lang}/products`">{{ text.ctaSecondary }}</router-link>
         </div>
       </div>
@@ -76,9 +76,14 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useJsonLd } from "../composables/useJsonLd";
 import { breadcrumbSchema, organizationSchema, siteOrigin } from "../lib/jsonLd";
+import { trackInquiryCta } from "../analytics";
 
 const route = useRoute();
 const lang = computed(() => (String(route.params.lang || "zh") === "en" ? "en" : "zh"));
+const trackInquiry = () => trackInquiryCta("about", {
+  cta_key: "about_contact",
+  cta_position: "about_cta"
+});
 
 const text = computed(() => {
   if (lang.value === "en") {

@@ -5,7 +5,7 @@
     <section class="intro"><h1>{{ detail.name }}</h1><div class="intro-grid"><p class="overview">{{ detail.overview }}</p><ul><li v-for="item in detail.highlights" :key="item"><span></span>{{ item }}</li></ul></div></section>
     <section v-if="detail.linkedSeries.length" class="series-section"><div class="section-heading"><h2>{{ lang === "en" ? "Suitable Product Series" : "适用产品系列" }}</h2></div><div class="series-list"><article v-for="item in detail.linkedSeries" :key="item.seriesSlug" class="series-card"><router-link :to="`/${lang}/products/${item.categorySlug}/${item.seriesSlug}`" class="series-image"><img :src="item.image" :alt="item.title" loading="lazy" /></router-link><div class="series-body"><h3><router-link :to="`/${lang}/products/${item.categorySlug}/${item.seriesSlug}`">{{ item.title }}</router-link></h3><p>{{ item.summary }}</p><router-link :to="`/${lang}/products/${item.categorySlug}/${item.seriesSlug}`" class="series-cta">{{ lang === "en" ? "Learn More" : "了解更多" }}</router-link></div></article></div></section>
     <section v-if="faqEntries.length" class="faq-section" aria-labelledby="faq-title"><h2 id="faq-title">{{ lang === "en" ? "Application Selection FAQ" : "应用选型常见问题" }}</h2><dl><div v-for="entry in faqEntries" :key="entry.question"><dt>{{ entry.question }}</dt><dd>{{ entry.answer }}</dd></div></dl></section>
-    <section class="inquiry-cta"><p>{{ lang === "en" ? "Need help matching materials to your application?" : "需要根据应用场景匹配合适材料？" }}</p><router-link :to="`/${lang}/contact?application=${detail.slug}`" @click="trackInquiry">{{ lang === "en" ? "Request a Recommendation" : "获取选型建议" }}</router-link></section>
+    <section class="inquiry-cta"><p>{{ lang === "en" ? "Need help matching materials to your application?" : "需要根据应用场景匹配合适材料？" }}</p><router-link :to="`/${lang}/contact?application=${detail.slug}&source=application-detail`" @click="trackInquiry">{{ lang === "en" ? "Request a Recommendation" : "获取选型建议" }}</router-link></section>
   </div>
   <section v-else class="loading-panel">{{ lang === "en" ? "Loading..." : "正在加载…" }}</section>
 </template>
@@ -14,7 +14,7 @@
 import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getApplicationDetail } from "../api/site";
-import { trackEvent } from "../analytics";
+import { trackInquiryCta } from "../analytics";
 import { useJsonLd } from "../composables/useJsonLd";
 import { breadcrumbSchema, faqPageSchema, siteOrigin } from "../lib/jsonLd";
 import type { Application } from "../types/site";
@@ -38,7 +38,11 @@ useJsonLd(computed(() => {
   ];
 }));
 const load = async () => { detail.value = undefined; try { detail.value = await getApplicationDetail(lang.value, slug.value); } catch (error) { if (import.meta.env.SSR) throw error; detail.value = undefined; } };
-const trackInquiry = () => trackEvent("application_inquiry_click", "application.detail", { payload: { application_slug: slug.value } });
+const trackInquiry = () => trackInquiryCta("application.detail", {
+  cta_key: "application_inquiry",
+  cta_position: "application_detail",
+  application_slug: slug.value
+});
 onMounted(load); onServerPrefetch(load); watch([lang, slug], load);
 </script>
 

@@ -81,7 +81,7 @@ import { computed, onMounted, onServerPrefetch, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { getCategories, getProductDetail, getSeries } from "../api/site";
 import type { Product, Series } from "../types/site";
-import { trackEvent } from "../analytics";
+import { trackEvent, trackInquiryCta } from "../analytics";
 import { useJsonLd } from "../composables/useJsonLd";
 import { breadcrumbSchema, productSchema, siteOrigin } from "../lib/jsonLd";
 
@@ -118,12 +118,10 @@ useJsonLd(computed(() => {
 }));
 
 const trackInquiry = () => {
-  trackEvent("inquiry_cta_click", "product.detail", {
-    payload: {
-      cta_key: "product_inquiry",
-      cta_position: "product_detail_hero",
-      product_slug: productSlug.value
-    }
+  trackInquiryCta("product.detail", {
+    cta_key: "product_inquiry",
+    cta_position: "product_detail_hero",
+    product_slug: productSlug.value
   });
 };
 
