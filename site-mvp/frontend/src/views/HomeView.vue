@@ -80,6 +80,19 @@
       </div>
     </section>
 
+    <section class="video-section" aria-labelledby="company-video-title">
+      <div class="module-heading video-heading">
+        <div>
+          <h2 id="company-video-title">{{ lang === "en" ? "Discover Our Material and Supply Capabilities" : "了解起点化工的材料与供应能力" }}</h2>
+        </div>
+        <p>{{ lang === "en" ? "Watch this two-minute overview of Origin Chemical's functional inorganic materials, affiliated manufacturing and testing operations, and technical and supply support for global customers." : "通过约两分钟的视频，了解起点化工的功能性无机材料产品、关联制造与检测场景，以及面向全球客户的技术和供应支持。" }}</p>
+      </div>
+      <CompanyVideo class="home-company-video" />
+      <router-link class="video-transcript-link" :to="`/${lang}/about#company-video`">
+        {{ lang === "en" ? "Read the full video transcript" : "查看完整视频文字稿" }} <span>→</span>
+      </router-link>
+    </section>
+
     <section class="company-section">
       <div class="company-copy">
         <h2>
@@ -143,12 +156,17 @@ import { useRoute } from "vue-router";
 import { getApplications, getCategories, getHome, getNews } from "../api/site";
 import type { Application, HomeSection, Category, News } from "../types/site";
 import { useJsonLd } from "../composables/useJsonLd";
-import { organizationSchema, webSiteSchema } from "../lib/jsonLd";
+import { organizationSchema, siteOrigin, videoSchema, webSiteSchema } from "../lib/jsonLd";
+import CompanyVideo from "../components/CompanyVideo.vue";
 import { trackInquiryCta } from "../analytics";
 
 const route = useRoute();
 const lang = computed(() => String(route.params.lang || "zh"));
-useJsonLd(computed(() => [organizationSchema(lang.value), webSiteSchema(lang.value)]));
+useJsonLd(computed(() => [
+  organizationSchema(lang.value),
+  webSiteSchema(lang.value),
+  videoSchema(lang.value, `${siteOrigin}/${lang.value}`)
+]));
 const homeSection = ref<HomeSection>();
 const categories = ref<Category[]>([]);
 const newsList = ref<News[]>([]);
@@ -852,6 +870,7 @@ const thumbStyle = (item: Category) => {
 
 .solution-section,
 .applications-section,
+.video-section,
 .company-section,
 .project-cta,
 .news-section {
@@ -888,6 +907,14 @@ const thumbStyle = (item: Category) => {
 .application-card:hover img { transform: scale(1.05); }
 
 .company-section { min-height: 100vh; grid-template-columns: minmax(0, .93fr) minmax(0, 1.07fr); align-content: center; gap: 82px; padding: 0 0 28px; border: 0; background: transparent; }
+
+/* Company introduction video block */
+.video-section { padding: 0 0 116px; }
+.video-heading { margin-bottom: 46px; }
+.home-company-video { max-width: 1080px; }
+.home-company-video :deep(.company-video-player) { border: 0; }
+.video-transcript-link { display: inline-flex; align-items: center; gap: 18px; margin-top: 22px; color: #1296e1; font-size: 16px; font-weight: 500; text-decoration: none; }
+.video-transcript-link span { font-size: 22px; font-weight: 400; }
 .company-copy { align-self: center; }
 .company-copy h2 { font-size: 50px; line-height: 58.3333px; color: #9ca3b0; font-weight: 500; letter-spacing: .8px; }
 .company-copy h2 span:last-child { color: #1296e1; }
@@ -921,7 +948,7 @@ const thumbStyle = (item: Category) => {
 @media (max-width: 1024px) {
   .home > section:not(.hero-wrap) { width: min(var(--site-width), calc(100vw - (var(--site-gutter) * 2))); }
 
-  .solution-section, .applications-section, .company-section, .project-cta, .news-section { width: min(860px, calc(100vw - 40px)); }
+  .solution-section, .applications-section, .video-section, .company-section, .project-cta, .news-section { width: min(860px, calc(100vw - 40px)); }
   .solution-section, .company-section, .news-section { min-height: 0; }
   .hero-overlay { left: 40px; bottom: 68px; }
   .hero-index { right: 20px; bottom: 16px; }
@@ -944,7 +971,9 @@ const thumbStyle = (item: Category) => {
   .hero-kicker { font-size: 13px; }
   .hero-index { right: 16px; bottom: 14px; gap: 10px; }
   .hero-step { width: 20px; height: 20px; }
-  .solution-section, .applications-section, .company-section, .project-cta, .news-section { width: calc(100vw - 30px); }
+  .solution-section, .applications-section, .video-section, .company-section, .project-cta, .news-section { width: calc(100vw - 30px); }
+  .video-section { padding-bottom: 64px; }
+  .video-heading { margin-bottom: 27px; }
   .solution-section { padding: 58px 0 62px; gap: 30px; }
   .solution-section .section-copy h2, .company-copy h2 { font-size: 39px; }
   .solution-desc p, .module-heading > p, .company-copy p { font-size: 16px; }

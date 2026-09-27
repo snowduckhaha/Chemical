@@ -26,6 +26,38 @@
       </div>
     </section>
 
+    <section id="company-video" class="video-section section-shell" aria-labelledby="video-title">
+      <div class="section-head">
+        <p class="section-kicker">VIDEO</p>
+        <h2 id="video-title">{{ text.videoTitle }}</h2>
+        <p class="video-intro">{{ text.videoIntro }}</p>
+      </div>
+      <CompanyVideo class="about-company-video" :caption="text.videoCaption" />
+    </section>
+
+    <section class="transcript-section section-shell" aria-labelledby="transcript-title">
+      <div class="section-head">
+        <p class="section-kicker">TRANSCRIPT</p>
+        <h2 id="transcript-title">{{ text.transcriptTitle }}</h2>
+      </div>
+      <div class="transcript-copy">
+        <p v-for="paragraph in text.transcriptParagraphs" :key="paragraph">{{ paragraph }}</p>
+      </div>
+    </section>
+
+    <section class="faq-section section-shell" aria-labelledby="faq-title">
+      <div class="section-head">
+        <p class="section-kicker">FAQ</p>
+        <h2 id="faq-title">{{ text.faqTitle }}</h2>
+      </div>
+      <div class="faq-list">
+        <article v-for="item in text.faqEntries" :key="item.question" class="faq-item">
+          <h3>{{ item.question }}</h3>
+          <p>{{ item.answer }}</p>
+        </article>
+      </div>
+    </section>
+
     <section class="capability-section section-shell" aria-labelledby="capability-title">
       <div class="section-head">
         <p class="section-kicker">CAPABILITIES</p>
@@ -75,7 +107,8 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useJsonLd } from "../composables/useJsonLd";
-import { breadcrumbSchema, organizationSchema, siteOrigin } from "../lib/jsonLd";
+import { breadcrumbSchema, organizationSchema, siteOrigin, videoSchema, faqPageSchema } from "../lib/jsonLd";
+import CompanyVideo from "../components/CompanyVideo.vue";
 import { trackInquiryCta } from "../analytics";
 
 const route = useRoute();
@@ -128,6 +161,44 @@ const text = computed(() => {
         "With transit warehouse coverage in Changzhou, Yichun and Dongguan, Origin Chemical supports faster response for key regional customers while balancing stable supply and delivery efficiency."
       ],
       qualityTags: ["ISO 9001 / ISO 14001", "3 Transit Warehouses", "Fast Sample Response"],
+      videoTitle: "Discover Origin Chemical's Material and Supply Capabilities",
+      videoIntro: "Watch this two-minute overview of Origin Chemical's functional inorganic materials, affiliated manufacturing and testing operations, and technical and supply support for global customers.",
+      videoCaption: "The video shows production, laboratory testing, warehousing, and product scenes from Origin Chemical's affiliated manufacturer, Jiangxi Qise Electronic Materials Co., Ltd.",
+      transcriptTitle: "Company Introduction Video Transcript",
+      transcriptParagraphs: [
+        "Founded in January 2010, Shenzhen Origin Chemical Industry Co., Ltd. (registered as Shenzhen Qidian Chemical Industry Co., Ltd.) ranks among China's early professional manufacturers integrating independent R&D, mass production, and global sales of functional inorganic chemical raw materials for the electronics and new-material industries.",
+        "Our core team boasts profound industry experience, allowing us to accurately capture diverse technical requirements from downstream manufacturers and provide targeted material solutions. Through over 16 years of persistent technical iteration and product upgrading, we have built a diversified product lineup meeting top-tier international standards.",
+        "Our product range covers specialty aluminum hydroxide, high-purity silica powder, high-grade alumina, as well as a full series of silane coupling agents. These versatile materials are widely applied in copper-clad laminates, semiconductor packaging, flame-retardant plastics, ceramic manufacturing, and photovoltaic supporting sectors, serving multiple high-end industrial chains.",
+        "Equipped with complete automated production lines and professional laboratory testing equipment, we realize large-scale, standardized manufacturing and full-index quality monitoring for all raw materials. We can flexibly respond to bulk orders and customized material demands, maintaining continuous, on-time, stable supply to numerous domestic and overseas manufacturers, helping partners stabilize production schedules and cut overall purchasing costs.",
+        "Adhering to the core business philosophy of cooperation and win-win, we implement strict full-process quality inspection and offer complete pre-sales, technical consultation, and after-sales support. We keep deepening material innovation to serve global new-material manufacturers, and we sincerely invite worldwide partners to create long-term, mutually beneficial cooperation with us."
+      ],
+      faqTitle: "Frequently Asked Questions About Origin Chemical",
+      faqEntries: [
+        {
+          question: "What does the video show?",
+          answer: "The video introduces Origin Chemical's functional inorganic material business and shows production, laboratory testing, warehousing, and product scenes from its affiliated manufacturer, Jiangxi Qise Electronic Materials Co., Ltd. It gives buyers a direct view of the coordinated manufacturing and supply capabilities behind the material portfolio."
+        },
+        {
+          question: "Which materials do you supply?",
+          answer: "The main portfolio includes specialty aluminum hydroxide, high-purity silica powder, high-grade alumina, and silane coupling agents. We can help identify a suitable product series based on the target application, key specifications, expected volume, and documentation requirements."
+        },
+        {
+          question: "Which industries use these materials?",
+          answer: "The materials support copper-clad laminates, semiconductor packaging, flame-retardant plastics, ceramic manufacturing, photovoltaic applications, electronic materials, and functional composites. Final product selection should be confirmed against the formulation, processing conditions, and target performance."
+        },
+        {
+          question: "How do you support quality and batch consistency?",
+          answer: "The manufacturing and supply system combines automated production equipment, laboratory testing, and full-process quality inspection. Quality communication can cover key indicators such as particle size, whiteness, oil absorption, moisture, and sieve residue, with relevant testing and technical documents provided for the selected product."
+        },
+        {
+          question: "Can you support bulk supply and customized requirements?",
+          answer: "Bulk supply and customized requirements can be evaluated according to order volume, delivery schedule, and technical specifications. For a faster assessment, include the application, target indicators, monthly demand, destination, and sample requirements in the inquiry."
+        },
+        {
+          question: "How can I request a recommendation or sample?",
+          answer: "Send us your target application, current material, key performance requirements, expected quantity, and delivery region. Our technical and sales teams can recommend a suitable series and confirm available samples, technical data sheets, test documents, and quotation details."
+        }
+      ],
       ctaTitle: "Need A Material Recommendation For Your Application?",
       ctaDescription: "Share your target application, performance requirements and expected quantity. Our team will help recommend suitable product series and documents.",
       ctaPrimary: "Get A Quote",
@@ -176,6 +247,44 @@ const text = computed(() => {
       "结合常州、宜春、东莞等中转仓布局，起点化工能够为重点区域客户提供更快的响应节奏，在稳定供应和交付效率之间取得平衡。"
     ],
     qualityTags: ["ISO 9001 / ISO 14001", "3 个中转仓", "快速样品响应"],
+    videoTitle: "了解起点化工的材料与供应能力",
+    videoIntro: "通过约两分钟的视频，了解起点化工的功能性无机材料产品、关联制造与检测场景，以及面向全球客户的技术和供应支持。",
+    videoCaption: "视频展示了关联生产企业江西起色电子材料有限公司的生产、实验室检测、仓储及产品场景。",
+    transcriptTitle: "公司介绍视频文字稿",
+    transcriptParagraphs: [
+      "深圳市起点化工有限公司成立于2010年1月，是中国较早集自主研发、规模化生产及全球销售于一体的功能性无机化工原料专业企业之一，服务于电子及新材料行业。",
+      "公司的核心团队拥有深厚的行业经验，能够准确把握下游制造商多样化的技术需求，并提供针对性的材料解决方案。经过16年持续的技术迭代与产品升级，公司已建立符合国际高端标准的多元化产品体系。",
+      "产品范围包括特种氢氧化铝、高纯硅微粉、高等级氧化铝以及全系列硅烷偶联剂。这些材料广泛应用于覆铜板、半导体封装、阻燃塑料、陶瓷制造及光伏配套等领域，服务多个高端产业链。",
+      "依托完整的自动化生产线和专业实验室检测设备，公司实现规模化、标准化制造，并对所有原材料开展全指标质量监控。公司能够灵活响应大批量订单及定制化材料需求，为众多国内外制造商持续提供准时、稳定的供应，帮助合作伙伴稳定生产计划并降低综合采购成本。",
+      "公司秉承“合作共赢”的核心经营理念，实施严格的全流程质量检验，并提供完整的售前支持、技术咨询和售后服务。我们持续深化材料创新，服务全球新材料制造商，并诚邀全球合作伙伴与我们建立长期互利的合作关系。"
+    ],
+    faqTitle: "关于起点化工的常见问题",
+    faqEntries: [
+      {
+        question: "视频展示了哪些内容？",
+        answer: "视频介绍了起点化工的功能性无机材料业务，并展示关联生产企业江西起色电子材料有限公司的生产、实验室检测、仓储及产品场景，帮助客户直观了解材料制造与供应协同能力。"
+      },
+      {
+        question: "主要提供哪些材料？",
+        answer: "主要材料包括特种氢氧化铝、高纯硅微粉、高等级氧化铝和硅烷偶联剂，可根据目标应用、关键指标、预计用量及文件要求协助匹配合适的产品系列。"
+      },
+      {
+        question: "产品应用于哪些行业？",
+        answer: "相关材料可用于覆铜板、半导体封装、阻燃塑料、陶瓷制造、光伏配套，以及电子材料和功能复合材料等应用。具体选型需要结合配方体系、加工条件和目标性能确认。"
+      },
+      {
+        question: "如何保障产品质量与批次稳定性？",
+        answer: "生产与供应体系结合自动化生产设备、实验室检测和全流程质量检验，围绕粒径、白度、吸油值、附着水、筛余等关键指标进行质量沟通，并根据具体产品提供相应的检测及技术资料。"
+      },
+      {
+        question: "是否支持批量供货和定制需求？",
+        answer: "可以根据采购数量、交付周期和技术指标评估批量供应或定制化需求。为提高沟通效率，建议询盘时同时提供应用领域、目标指标、月度用量、目的地和样品需求。"
+      },
+      {
+        question: "如何获得材料推荐和样品？",
+        answer: "请提交目标应用、现用材料、关键性能要求、预计用量及交付地区。技术和销售团队会据此推荐产品系列，并确认可提供的样品、技术数据表、检测资料和报价信息。"
+      }
+    ],
     ctaTitle: "需要了解适合您应用的材料方案？",
     ctaDescription: "告诉我们您的目标应用、性能要求和预计用量，我们将协助推荐合适的产品系列与资料。",
     ctaPrimary: "索取报价",
@@ -186,6 +295,8 @@ const text = computed(() => {
 const pageUrl = computed(() => `${siteOrigin}/${lang.value}/about`);
 useJsonLd(computed(() => [
   organizationSchema(lang.value),
+  videoSchema(lang.value, pageUrl.value),
+  faqPageSchema(text.value.faqEntries, pageUrl.value, lang.value),
   breadcrumbSchema(pageUrl.value, [
     { name: text.value.breadcrumbHome, url: `${siteOrigin}/${lang.value}` },
     { name: text.value.breadcrumbCurrent }
@@ -337,6 +448,75 @@ useJsonLd(computed(() => [
   padding-bottom: 68px;
 }
 
+/* Company video, transcript and FAQ blocks */
+.video-section {
+  padding-top: 26px;
+  padding-bottom: 68px;
+}
+
+.video-intro {
+  max-width: 760px;
+  color: var(--pf-muted);
+  line-height: 1.78;
+}
+
+.about-company-video {
+  max-width: 980px;
+}
+
+.transcript-section {
+  padding-top: 24px;
+  padding-bottom: 68px;
+}
+
+.transcript-copy {
+  max-width: 860px;
+  display: grid;
+  gap: 16px;
+}
+
+.transcript-copy p {
+  margin: 0;
+  color: var(--pf-muted);
+  line-height: 1.85;
+  font-size: 1rem;
+}
+
+.faq-section {
+  padding-top: 24px;
+  padding-bottom: 72px;
+}
+
+.faq-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.faq-item {
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #dfe9f4;
+  border-radius: 6px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.faq-item h3 {
+  margin: 0;
+  color: #18314f;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.faq-item p {
+  margin: 0;
+  color: var(--pf-muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
 .capability-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -478,7 +658,8 @@ useJsonLd(computed(() => [
   .capability-grid,
   .quality-section,
   .profile-grid,
-  .cta-inner {
+  .cta-inner,
+  .faq-list {
     grid-template-columns: 1fr;
   }
 

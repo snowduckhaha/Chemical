@@ -161,3 +161,33 @@ export function faqPageSchema(entries: FaqEntry[], pageUrl: string, lang: string
     }))
   };
 }
+
+export const COMPANY_VIDEO_URL = "/about/company-introduction-video.mp4";
+export const COMPANY_VIDEO_POSTER = "/about/company-video-poster.webp";
+export const COMPANY_VIDEO_DURATION = "PT2M20S";
+export const COMPANY_VIDEO_UPLOAD_DATE = "2026-09-22";
+
+/**
+ * VideoObject for the self-hosted company introduction video embedded on the
+ * home and about pages. The English name keeps the legal entity name in the
+ * first sentence pattern used by the page transcript.
+ */
+export function videoSchema(lang: string, pageUrl: string): JsonLdNode {
+  const zh = lang !== "en";
+  return clean({
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "@id": `${siteOrigin}/about/company-introduction-video.mp4#video`,
+    name: zh ? "起点化工公司与产品介绍" : "Origin Chemical Company and Product Introduction",
+    description: zh
+      ? "通过约两分钟的视频，了解起点化工的功能性无机材料产品、关联制造与检测场景，以及面向全球客户的技术和供应支持。"
+      : "Watch this two-minute overview of Origin Chemical's functional inorganic materials, affiliated manufacturing and testing operations, and technical and supply support for global customers.",
+    thumbnailUrl: [absoluteUrl(COMPANY_VIDEO_POSTER)],
+    uploadDate: COMPANY_VIDEO_UPLOAD_DATE,
+    duration: COMPANY_VIDEO_DURATION,
+    contentUrl: absoluteUrl(COMPANY_VIDEO_URL),
+    embedUrl: pageUrl,
+    inLanguage: zh ? "zh-CN" : "en",
+    publisher: { "@id": ORGANIZATION_ID }
+  });
+}
