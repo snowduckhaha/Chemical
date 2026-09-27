@@ -28,7 +28,7 @@ umask 077
 
 compose=(docker compose --env-file .env -f "$COMPOSE_FILE")
 mysql_exec() {
-  "${compose[@]}" exec -T mysql mysql -N -B -uroot -p"${MYSQL_ROOT_PASSWORD}" "$@"
+  "${compose[@]}" exec -T mysql mysql --default-character-set=utf8mb4 -N -B -uroot -p"${MYSQL_ROOT_PASSWORD}" "$@"
 }
 
 latest_file="$(mysql_exec -e 'SHOW MASTER STATUS' | awk 'NR==1 {print $1}')"
@@ -46,7 +46,7 @@ if [[ "$(date -u +%u)" == "$FULL_BACKUP_WEEKDAY" ]] || ! find "$full_dir" -name 
   # --master-data=2 places the binary-log coordinates in a comment inside the
   # dump. It is safe to restore manually and provides the increment start.
   "${compose[@]}" exec -T mysql \
-    mysqldump -uroot -p"${MYSQL_ROOT_PASSWORD}" \
+    mysqldump --default-character-set=utf8mb4 -uroot -p"${MYSQL_ROOT_PASSWORD}" \
     --single-transaction --routines --triggers --events --master-data=2 qidian_site \
     | gzip >"$full_dir/qidian_site_${stamp}.sql.gz"
   baseline_file="$(mysql_exec -e 'SHOW MASTER STATUS' | awk 'NR==1 {print $1}')"

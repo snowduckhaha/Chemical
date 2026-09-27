@@ -72,7 +72,7 @@ mkdir -p "$UPLOADS_DIR" "$MYSQL_DATA_DIR" "${BACKUP_DIR:-/opt/chemical/backups}"
 docker compose --env-file .env -f "$COMPOSE_FILE" up -d mysql
 for migration in V19__deployment_jobs.sql V20__seo_meta_page_brand.sql V21__improve_public_image_alt_text.sql; do
   docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql \
-    mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" qidian_site <"$APP_DIR/sql/$migration"
+    mysql --default-character-set=utf8mb4 -uroot -p"${MYSQL_ROOT_PASSWORD}" qidian_site <"$APP_DIR/sql/$migration"
 done
 
 docker compose --env-file .env -f "$COMPOSE_FILE" build backend

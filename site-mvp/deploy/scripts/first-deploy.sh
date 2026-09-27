@@ -39,7 +39,7 @@ sql_scripts=(
 )
 for script in "${sql_scripts[@]}"; do
   docker compose --env-file .env -f "$COMPOSE_FILE" exec -T mysql \
-    mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" qidian_site <"$APP_DIR/sql/$script"
+    mysql --default-character-set=utf8mb4 -uroot -p"${MYSQL_ROOT_PASSWORD}" qidian_site <"$APP_DIR/sql/$script"
 done
 
 APP_DIR="$APP_DIR" bash "$APP_DIR/deploy/scripts/deploy.sh"
