@@ -19,21 +19,7 @@
       </section>
 
       <section class="card relation-editor">
-        <form v-if="formMode" class="application-form" @submit.prevent="saveApplication">
-          <div class="section-heading"><h2>{{ formMode === "create" ? "新增应用领域" : "编辑应用领域" }}</h2></div>
-          <div class="field-grid">
-            <label><span>领域名称（中文）<b>*</b></span><input v-model.trim="form.nameZh" required /></label>
-            <label><span>领域名称（英文）<b>*</b></span><input v-model.trim="form.nameEn" required /></label>
-            <label class="wide"><span>URL 标识</span><input :value="previewSlug" readonly /></label>
-            <label><span>排序<b>*</b></span><input v-model.number="form.sortOrder" type="number" required /></label>
-            <label><span>发布状态<b>*</b></span><select v-model="form.publishStatus" required><option value="DRAFT">草稿</option><option value="PUBLISHED">已发布</option><option value="OFFLINE">已下线</option></select></label>
-            <label class="wide"><span>领域简介（中文）</span><textarea v-model.trim="form.overviewZh" rows="4" /></label>
-            <label class="wide"><span>领域简介（英文）</span><textarea v-model.trim="form.overviewEn" rows="4" /></label>
-          </div>
-          <div class="actions"><button class="primary" :disabled="saving">{{ saving ? "保存中…" : "保存领域" }}</button><button type="button" @click="cancelForm">取消</button></div>
-        </form>
-
-        <template v-else-if="selectedApplication">
+        <template v-if="selectedApplication">
           <div class="section-heading">
             <div><p class="eyebrow">当前领域</p><h2>{{ selectedApplication.name_zh }}</h2><p>{{ selectedApplication.overview_zh }}</p></div>
             <div class="heading-actions"><span class="status">{{ statusLabel(selectedApplication.publish_status) }}</span><button @click="startEdit">编辑领域</button><button class="danger" @click="removeApplication">删除领域</button></div>
@@ -56,11 +42,27 @@
         <p v-else class="empty">请新增或从左侧选择一个应用领域。</p>
       </section>
     </div>
+
+    <AdminDrawer :open="Boolean(formMode)" :title="formMode === 'create' ? '新增应用领域' : '编辑应用领域'" subtitle="带 * 为必填。" width="700px" @close="cancelForm">
+      <form v-if="formMode" class="application-form" @submit.prevent="saveApplication">
+        <div class="field-grid">
+          <label><span>领域名称（中文）<b>*</b></span><input v-model.trim="form.nameZh" required /></label>
+          <label><span>领域名称（英文）<b>*</b></span><input v-model.trim="form.nameEn" required /></label>
+          <label class="wide"><span>URL 标识</span><input :value="previewSlug" readonly /></label>
+          <label><span>排序<b>*</b></span><input v-model.number="form.sortOrder" type="number" required /></label>
+          <label><span>发布状态<b>*</b></span><select v-model="form.publishStatus" required><option value="DRAFT">草稿</option><option value="PUBLISHED">已发布</option><option value="OFFLINE">已下线</option></select></label>
+          <label class="wide"><span>领域简介（中文）</span><textarea v-model.trim="form.overviewZh" rows="4" /></label>
+          <label class="wide"><span>领域简介（英文）</span><textarea v-model.trim="form.overviewEn" rows="4" /></label>
+        </div>
+        <div class="actions"><button class="primary" :disabled="saving">{{ saving ? "保存中…" : "保存领域" }}</button><button type="button" @click="cancelForm">取消</button></div>
+      </form>
+    </AdminDrawer>
   </AdminShell>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import AdminDrawer from "../components/AdminDrawer.vue";
 import AdminShell from "../components/AdminShell.vue";
 import { adminApplicationSeriesOptions, adminCreateApplication, adminDeleteApplication, adminGetApplicationSeries, adminListApplications, adminUpdateApplication, adminUpdateApplicationSeries } from "../api/site";
 import { useAdminFeedback } from "../composables/useAdminFeedback";
@@ -134,7 +136,6 @@ const cancelForm = async () => {
   formMode.value = null;
   if (!selectedId.value && applications.value[0]) await selectApplication(applications.value[0]);
 };
-
 const saveApplication = async () => {
   try {
     saving.value = true;
