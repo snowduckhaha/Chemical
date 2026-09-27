@@ -10,9 +10,12 @@ server {
     add_header X-Frame-Options SAMEORIGIN always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
 
-    # Public read-only content APIs may be cached by CDN for a short time.
-    # The query string (especially lang/page/pageSize) must remain part of the
-    # CDN cache key.
+    # Public read-only content APIs must always reach the origin. The CDN edge
+    # previously ignored the s-maxage TTL below and served multi-day stale
+    # entries (outdated SEO titles, news lists), so shared caches are now told
+    # not to store these responses at all; browsers may cache for 60 seconds.
+    # The query string (especially lang/page/pageSize) must remain part of any
+    # cache key if caching is ever re-enabled.
     location ~ ^/api/v1/(?:nav$|home$|products(?:/|$)|applications(?:/|$)|news(?:/|$)|seo$) {
         limit_except GET HEAD { deny all; }
         proxy_pass http://backend:8080;
@@ -24,7 +27,7 @@ server {
         proxy_set_header Cookie "";
         proxy_hide_header Cache-Control;
         proxy_hide_header Set-Cookie;
-        add_header Cache-Control "public, max-age=60, s-maxage=300, stale-while-revalidate=60" always;
+        add_header Cache-Control "private, max-age=60" always;
         proxy_read_timeout 60s;
     }
 
