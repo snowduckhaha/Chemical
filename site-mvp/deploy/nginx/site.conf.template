@@ -72,6 +72,16 @@ server {
         add_header X-Robots-Tag "noindex, nofollow" always;
         add_header Cache-Control "private, no-store" always;
     }
+	
+    # Root path "/" 301-redirects to the default language page (/zh) so that
+    # crawlers and users land on the real homepage instead of the bare SPA shell.
+    # absolute_redirect off makes Location relative (/zh) so the browser keeps
+    # the original HTTPS scheme when behind the CDN (which terminates TLS).
+    location = / {
+        absolute_redirect off;
+        return 301 /zh;
+        add_header Cache-Control "public, max-age=3600" always;
+    }
 
     location / {
         proxy_pass http://frontend:8080;
