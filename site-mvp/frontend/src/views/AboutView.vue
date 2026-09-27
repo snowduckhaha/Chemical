@@ -35,16 +35,6 @@
       <CompanyVideo class="about-company-video" :caption="text.videoCaption" />
     </section>
 
-    <section class="transcript-section section-shell" aria-labelledby="transcript-title">
-      <div class="section-head">
-        <p class="section-kicker">TRANSCRIPT</p>
-        <h2 id="transcript-title">{{ text.transcriptTitle }}</h2>
-      </div>
-      <div class="transcript-copy">
-        <p v-for="paragraph in text.transcriptParagraphs" :key="paragraph">{{ paragraph }}</p>
-      </div>
-    </section>
-
     <section class="faq-section section-shell" aria-labelledby="faq-title">
       <div class="section-head">
         <p class="section-kicker">FAQ</p>
@@ -127,9 +117,11 @@ const text = computed(() => {
       profileImageAlt: "Origin Chemical factory and production environment",
       profileTitle: "About Us",
       profileParagraphs: [
-        "Shenzhen Origin Chemical Co., Ltd. focuses on aluminum hydroxide and related advanced inorganic materials for copper clad laminate and functional material applications. We provide reliable product options and technical support for halogen-free flame retardancy, functional fillers and stable sourcing.",
-        "Our products serve electronic materials, engineering plastics, wire and cable, and functional composite applications. With coordinated manufacturing resources, quality inspection capability and transit warehouse coverage, we help customers reduce sourcing risk and improve material evaluation efficiency.",
-        "For global B2B customers, Origin Chemical is committed to clear product structures, traceable quality control and timely business response, becoming a long-term partner in flame-retardant and functional inorganic materials."
+        "Founded in January 2010, Shenzhen Origin Chemical Industry Co., Ltd. (registered as Shenzhen Qidian Chemical Industry Co., Ltd.) ranks among China's early professional manufacturers integrating independent R&D, mass production, and global sales of functional inorganic chemical raw materials for the electronics and new-material industries.",
+        "Our core team boasts profound industry experience, allowing us to accurately capture diverse technical requirements from downstream manufacturers and provide targeted material solutions. Through over 16 years of persistent technical iteration and product upgrading, we have built a diversified product lineup meeting top-tier international standards.",
+        "Our product range covers specialty aluminum hydroxide, high-purity silica powder, high-grade alumina, as well as a full series of silane coupling agents. These versatile materials are widely applied in copper-clad laminates, semiconductor packaging, flame-retardant plastics, ceramic manufacturing, and photovoltaic supporting sectors, serving multiple high-end industrial chains.",
+        "Equipped with complete automated production lines and professional laboratory testing equipment, we realize large-scale, standardized manufacturing and full-index quality monitoring for all raw materials. We can flexibly respond to bulk orders and customized material demands, maintaining continuous, on-time, stable supply to numerous domestic and overseas manufacturers, helping partners stabilize production schedules and cut overall purchasing costs.",
+        "Adhering to the core business philosophy of cooperation and win-win, we implement strict full-process quality inspection and offer complete pre-sales, technical consultation, and after-sales support. We keep deepening material innovation to serve global new-material manufacturers, and we sincerely invite worldwide partners to create long-term, mutually beneficial cooperation with us."
       ],
       capabilityTitle: "Material Capability For Stable Sourcing",
       capabilities: [
@@ -164,14 +156,6 @@ const text = computed(() => {
       videoTitle: "Discover Origin Chemical's Material and Supply Capabilities",
       videoIntro: "Watch this two-minute overview of Origin Chemical's functional inorganic materials, affiliated manufacturing and testing operations, and technical and supply support for global customers.",
       videoCaption: "The video shows production, laboratory testing, warehousing, and product scenes from Origin Chemical's affiliated manufacturer, Jiangxi Qise Electronic Materials Co., Ltd.",
-      transcriptTitle: "Company Introduction Video Transcript",
-      transcriptParagraphs: [
-        "Founded in January 2010, Shenzhen Origin Chemical Industry Co., Ltd. (registered as Shenzhen Qidian Chemical Industry Co., Ltd.) ranks among China's early professional manufacturers integrating independent R&D, mass production, and global sales of functional inorganic chemical raw materials for the electronics and new-material industries.",
-        "Our core team boasts profound industry experience, allowing us to accurately capture diverse technical requirements from downstream manufacturers and provide targeted material solutions. Through over 16 years of persistent technical iteration and product upgrading, we have built a diversified product lineup meeting top-tier international standards.",
-        "Our product range covers specialty aluminum hydroxide, high-purity silica powder, high-grade alumina, as well as a full series of silane coupling agents. These versatile materials are widely applied in copper-clad laminates, semiconductor packaging, flame-retardant plastics, ceramic manufacturing, and photovoltaic supporting sectors, serving multiple high-end industrial chains.",
-        "Equipped with complete automated production lines and professional laboratory testing equipment, we realize large-scale, standardized manufacturing and full-index quality monitoring for all raw materials. We can flexibly respond to bulk orders and customized material demands, maintaining continuous, on-time, stable supply to numerous domestic and overseas manufacturers, helping partners stabilize production schedules and cut overall purchasing costs.",
-        "Adhering to the core business philosophy of cooperation and win-win, we implement strict full-process quality inspection and offer complete pre-sales, technical consultation, and after-sales support. We keep deepening material innovation to serve global new-material manufacturers, and we sincerely invite worldwide partners to create long-term, mutually beneficial cooperation with us."
-      ],
       faqTitle: "Frequently Asked Questions About Origin Chemical",
       faqEntries: [
         {
@@ -213,9 +197,11 @@ const text = computed(() => {
     profileImageAlt: "起点化工工厂与生产环境",
     profileTitle: "关于我们",
     profileParagraphs: [
-      "深圳市起点化工有限公司专注于覆铜板行业用氢氧化铝及相关新材料，围绕无卤阻燃、功能性填料和稳定供应，为客户提供可靠的产品选择与技术支持。",
-      "公司长期服务于电子材料、工程塑料、电线电缆及功能复合材料等应用场景，重视产品稳定性、批次一致性与交付效率。依托生产制造协同、质量检测能力和多地中转仓布局，我们帮助客户降低采购风险，提升材料评估与导入效率。",
-      "面向全球 B2B 客户，起点化工坚持以清晰的产品体系、可追溯的质量控制和及时的业务响应，成为客户在阻燃与功能性无机材料领域的长期合作伙伴。"
+      "深圳市起点化工有限公司成立于2010年1月，是中国较早集自主研发、规模化生产及全球销售于一体的功能性无机化工原料专业企业之一，服务于电子及新材料行业。",
+      "公司的核心团队拥有深厚的行业经验，能够准确把握下游制造商多样化的技术需求，并提供针对性的材料解决方案。经过16年持续的技术迭代与产品升级，公司已建立符合国际高端标准的多元化产品体系。",
+      "产品范围包括特种氢氧化铝、高纯硅微粉、高等级氧化铝以及全系列硅烷偶联剂。这些材料广泛应用于覆铜板、半导体封装、阻燃塑料、陶瓷制造及光伏配套等领域，服务多个高端产业链。",
+      "依托完整的自动化生产线和专业实验室检测设备，公司实现规模化、标准化制造，并对所有原材料开展全指标质量监控。公司能够灵活响应大批量订单及定制化材料需求，为众多国内外制造商持续提供准时、稳定的供应，帮助合作伙伴稳定生产计划并降低综合采购成本。",
+      "公司秉承“合作共赢”的核心经营理念，实施严格的全流程质量检验，并提供完整的售前支持、技术咨询和售后服务。我们持续深化材料创新，服务全球新材料制造商，并诚邀全球合作伙伴与我们建立长期互利的合作关系。"
     ],
     capabilityTitle: "稳定采购所需的材料能力",
     capabilities: [
@@ -250,14 +236,6 @@ const text = computed(() => {
     videoTitle: "了解起点化工的材料与供应能力",
     videoIntro: "通过约两分钟的视频，了解起点化工的功能性无机材料产品、关联制造与检测场景，以及面向全球客户的技术和供应支持。",
     videoCaption: "视频展示了关联生产企业江西起色电子材料有限公司的生产、实验室检测、仓储及产品场景。",
-    transcriptTitle: "公司介绍视频文字稿",
-    transcriptParagraphs: [
-      "深圳市起点化工有限公司成立于2010年1月，是中国较早集自主研发、规模化生产及全球销售于一体的功能性无机化工原料专业企业之一，服务于电子及新材料行业。",
-      "公司的核心团队拥有深厚的行业经验，能够准确把握下游制造商多样化的技术需求，并提供针对性的材料解决方案。经过16年持续的技术迭代与产品升级，公司已建立符合国际高端标准的多元化产品体系。",
-      "产品范围包括特种氢氧化铝、高纯硅微粉、高等级氧化铝以及全系列硅烷偶联剂。这些材料广泛应用于覆铜板、半导体封装、阻燃塑料、陶瓷制造及光伏配套等领域，服务多个高端产业链。",
-      "依托完整的自动化生产线和专业实验室检测设备，公司实现规模化、标准化制造，并对所有原材料开展全指标质量监控。公司能够灵活响应大批量订单及定制化材料需求，为众多国内外制造商持续提供准时、稳定的供应，帮助合作伙伴稳定生产计划并降低综合采购成本。",
-      "公司秉承“合作共赢”的核心经营理念，实施严格的全流程质量检验，并提供完整的售前支持、技术咨询和售后服务。我们持续深化材料创新，服务全球新材料制造商，并诚邀全球合作伙伴与我们建立长期互利的合作关系。"
-    ],
     faqTitle: "关于起点化工的常见问题",
     faqEntries: [
       {
@@ -448,7 +426,7 @@ useJsonLd(computed(() => [
   padding-bottom: 68px;
 }
 
-/* Company video, transcript and FAQ blocks */
+/* Company video and FAQ blocks */
 .video-section {
   padding-top: 26px;
   padding-bottom: 68px;
@@ -462,24 +440,6 @@ useJsonLd(computed(() => [
 
 .about-company-video {
   max-width: 980px;
-}
-
-.transcript-section {
-  padding-top: 24px;
-  padding-bottom: 68px;
-}
-
-.transcript-copy {
-  max-width: 860px;
-  display: grid;
-  gap: 16px;
-}
-
-.transcript-copy p {
-  margin: 0;
-  color: var(--pf-muted);
-  line-height: 1.85;
-  font-size: 1rem;
 }
 
 .faq-section {

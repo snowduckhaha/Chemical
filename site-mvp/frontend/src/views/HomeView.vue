@@ -89,7 +89,7 @@
       </div>
       <CompanyVideo class="home-company-video" />
       <router-link class="video-transcript-link" :to="`/${lang}/about#company-video`">
-        {{ lang === "en" ? "Read the full video transcript" : "查看完整视频文字稿" }} <span>→</span>
+        {{ lang === "en" ? "Discover Origin Chemical" : "了解起点化工" }} <span>→</span>
       </router-link>
     </section>
 
