@@ -26,15 +26,6 @@
       </div>
     </section>
 
-    <section id="company-video" class="video-section section-shell" aria-labelledby="video-title">
-      <div class="section-head">
-        <p class="section-kicker">VIDEO</p>
-        <h2 id="video-title">{{ text.videoTitle }}</h2>
-        <p class="video-intro">{{ text.videoIntro }}</p>
-      </div>
-      <CompanyVideo class="about-company-video" :caption="text.videoCaption" />
-    </section>
-
     <section class="faq-section section-shell" aria-labelledby="faq-title">
       <div class="section-head">
         <p class="section-kicker">FAQ</p>
@@ -97,8 +88,7 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useJsonLd } from "../composables/useJsonLd";
-import { breadcrumbSchema, organizationSchema, siteOrigin, videoSchema, faqPageSchema } from "../lib/jsonLd";
-import CompanyVideo from "../components/CompanyVideo.vue";
+import { breadcrumbSchema, organizationSchema, siteOrigin, faqPageSchema } from "../lib/jsonLd";
 import { trackInquiryCta } from "../analytics";
 
 const route = useRoute();
@@ -153,9 +143,6 @@ const text = computed(() => {
         "With transit warehouse coverage in Changzhou, Yichun and Dongguan, Origin Chemical supports faster response for key regional customers while balancing stable supply and delivery efficiency."
       ],
       qualityTags: ["ISO 9001 / ISO 14001", "3 Transit Warehouses", "Fast Sample Response"],
-      videoTitle: "Discover Origin Chemical's Material and Supply Capabilities",
-      videoIntro: "Watch this two-minute overview of Origin Chemical's functional inorganic materials, affiliated manufacturing and testing operations, and technical and supply support for global customers.",
-      videoCaption: "The video shows production, laboratory testing, warehousing, and product scenes from Origin Chemical's affiliated manufacturer, Jiangxi Qise Electronic Materials Co., Ltd.",
       faqTitle: "Frequently Asked Questions About Origin Chemical",
       faqEntries: [
         {
@@ -233,9 +220,6 @@ const text = computed(() => {
       "结合常州、宜春、东莞等中转仓布局，起点化工能够为重点区域客户提供更快的响应节奏，在稳定供应和交付效率之间取得平衡。"
     ],
     qualityTags: ["ISO 9001 / ISO 14001", "3 个中转仓", "快速样品响应"],
-    videoTitle: "了解起点化工的材料与供应能力",
-    videoIntro: "通过约两分钟的视频，了解起点化工的功能性无机材料产品、关联制造与检测场景，以及面向全球客户的技术和供应支持。",
-    videoCaption: "视频展示了关联生产企业江西起色电子材料有限公司的生产、实验室检测、仓储及产品场景。",
     faqTitle: "关于起点化工的常见问题",
     faqEntries: [
       {
@@ -273,7 +257,6 @@ const text = computed(() => {
 const pageUrl = computed(() => `${siteOrigin}/${lang.value}/about`);
 useJsonLd(computed(() => [
   organizationSchema(lang.value),
-  videoSchema(lang.value, pageUrl.value),
   faqPageSchema(text.value.faqEntries, pageUrl.value, lang.value),
   breadcrumbSchema(pageUrl.value, [
     { name: text.value.breadcrumbHome, url: `${siteOrigin}/${lang.value}` },
@@ -426,22 +409,7 @@ useJsonLd(computed(() => [
   padding-bottom: 68px;
 }
 
-/* Company video and FAQ blocks */
-.video-section {
-  padding-top: 26px;
-  padding-bottom: 68px;
-}
-
-.video-intro {
-  max-width: 760px;
-  color: var(--pf-muted);
-  line-height: 1.78;
-}
-
-.about-company-video {
-  max-width: 980px;
-}
-
+/* FAQ block */
 .faq-section {
   padding-top: 24px;
   padding-bottom: 72px;

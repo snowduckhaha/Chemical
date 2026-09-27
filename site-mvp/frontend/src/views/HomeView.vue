@@ -88,7 +88,7 @@
         <p>{{ lang === "en" ? "Watch this two-minute overview of Origin Chemical's functional inorganic materials, affiliated manufacturing and testing operations, and technical and supply support for global customers." : "通过约两分钟的视频，了解起点化工的功能性无机材料产品、关联制造与检测场景，以及面向全球客户的技术和供应支持。" }}</p>
       </div>
       <CompanyVideo class="home-company-video" />
-      <router-link class="video-transcript-link" :to="`/${lang}/about#company-video`">
+      <router-link class="video-transcript-link" :to="`/${lang}/about`">
         {{ lang === "en" ? "Discover Origin Chemical" : "了解起点化工" }} <span>→</span>
       </router-link>
     </section>

@@ -163,13 +163,13 @@ export function faqPageSchema(entries: FaqEntry[], pageUrl: string, lang: string
 }
 
 export const COMPANY_VIDEO_URL = "/about/company-introduction-video.mp4";
-export const COMPANY_VIDEO_POSTER = "/about/company-video-poster.webp";
+export const COMPANY_VIDEO_POSTER = "/about/company-video-cover.webp";
 export const COMPANY_VIDEO_DURATION = "PT2M20S";
 export const COMPANY_VIDEO_UPLOAD_DATE = "2026-09-22";
 
 /**
  * VideoObject for the self-hosted company introduction video embedded on the
- * home and about pages. The English name keeps the legal entity name in the
+ * home page. The English name keeps the legal entity name in the
  * first sentence pattern used by the page transcript.
  */
 export function videoSchema(lang: string, pageUrl: string): JsonLdNode {
