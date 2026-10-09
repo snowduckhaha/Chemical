@@ -133,12 +133,12 @@
           <h4>{{ lang === "zh" ? "联系我们" : "Contact" }}</h4>
           <a href="tel:+8613580598793">{{ lang === "zh" ? "电话: +86-13580598793" : "Tel: +86-13580598793" }}</a>
           <a href="tel:+886076985166074">{{ lang === "zh" ? "电话/传真: 00886-0769-85166074" : "Tel&Fax: 00886-0769-85166074" }}</a>
-          <a href="mailto:renee957888@gmail.com">{{ lang === "zh" ? "电子邮件: renee957888@gmail.com" : "Email: renee957888@gmail.com" }}</a>
+          <a href="mailto:admin@origin-chemical.com">{{ lang === "zh" ? "电子邮件: admin@origin-chemical.com" : "Email: admin@origin-chemical.com" }}</a>
           <p>
             {{
               lang === "zh"
-                ? "地址: 中国广东省深圳市前进路兴业公司4号楼2层212室"
-                : "ADD: No.212, 2nd Floor, Building 4, Xingye Company, Qianjin Road, Shenzhen City, Guangdong Province, China"
+                ? "工厂地址: 江西省宜春市袁州区工业大道67号"
+                : "Factory Address: No.67, Gongye Avenue, Yuanzhou District, Yichun City, Jiangxi Province, China"
             }}
           </p>
         </section>

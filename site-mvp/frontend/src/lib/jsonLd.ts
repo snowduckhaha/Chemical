@@ -38,7 +38,7 @@ export function organizationSchema(lang: string): JsonLdNode {
     name: zh ? "深圳市起点化工有限公司" : "Shenzhen Origin Chemical Industry Co., Ltd.",
     url: siteOrigin,
     logo: absoluteUrl("/products/logo-symbol-footer.png"),
-    email: "renee957888@gmail.com",
+    email: "admin@origin-chemical.com",
     telephone: "+86-13580598793",
     faxNumber: "00886-0769-85166074",
     description: zh
@@ -50,10 +50,10 @@ export function organizationSchema(lang: string): JsonLdNode {
     address: {
       "@type": "PostalAddress",
       streetAddress: zh
-        ? "前进路兴业公司4号楼2层212室"
-        : "No.212, 2nd Floor, Building 4, Xingye Company, Qianjin Road",
-      addressLocality: zh ? "深圳市" : "Shenzhen",
-      addressRegion: zh ? "广东省" : "Guangdong",
+        ? "袁州区工业大道67号"
+        : "No.67, Gongye Avenue, Yuanzhou District",
+      addressLocality: zh ? "宜春市" : "Yichun",
+      addressRegion: zh ? "江西省" : "Jiangxi",
       addressCountry: "CN"
     }
   });
