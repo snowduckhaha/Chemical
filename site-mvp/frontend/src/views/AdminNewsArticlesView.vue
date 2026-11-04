@@ -31,7 +31,10 @@
         </section>
 
         <section v-show="activeTab === 'content'" class="tab-panel" data-tab="content">
-          <div class="editor-grid"><label>正文（中文）<RichTextEditor v-model="form.contentZh" placeholder="输入中文正文；可用工具栏插入表格。" /></label><label>正文（英文）<RichTextEditor v-model="form.contentEn" placeholder="Enter English content; use the toolbar to insert a table." /></label></div>
+          <div class="editor-grid">
+            <div class="editor-field"><span>正文（中文）</span><RichTextEditor v-model="form.contentZh" aria-label="正文（中文）" placeholder="输入中文正文；可用工具栏插入表格。" /></div>
+            <div class="editor-field"><span>正文（英文）</span><RichTextEditor v-model="form.contentEn" aria-label="正文（英文）" placeholder="Enter English content; use the toolbar to insert a table." /></div>
+          </div>
           <ImageUploadField :key="imageKey" v-model="form.coverImageUrl" label="资讯封面图" scene="NEWS_COVER" />
           <div class="two"><label>封面 Alt（中文）<input v-model.trim="form.coverAltZh" /></label><label>封面 Alt（英文）<input v-model.trim="form.coverAltEn" /></label></div>
         </section>
@@ -85,5 +88,6 @@ const formatDate = (value: unknown) => value ? new Date(String(value)).toLocaleS
 onMounted(async () => { try { await Promise.all([loadOptions(), load()]); } catch { feedback.error("资讯管理初始化失败。"); } });
 </script>
 <style scoped>
+.editor-field{display:grid;gap:5px;color:#334155;font-size:.83rem;font-weight:700;min-width:0}
 .card{border:1px solid #e2e8f0;border-radius:12px;padding:18px;background:#fff}.card+.card{margin-top:18px}.filters,.actions,.row-actions,.pager,.heading{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.filters input{min-width:280px}.filters a,.actions a,.row-actions a{border:1px solid #cbd5e1;border-radius:7px;padding:7px 9px;color:#2563eb;text-decoration:none}.form{display:grid;gap:13px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form label{display:grid;gap:5px;color:#334155;font-size:.83rem;font-weight:700}input,select,textarea,button{border:1px solid #cbd5e1;border-radius:7px;padding:8px 10px;background:#fff;font:inherit}select[multiple]{min-height:120px}textarea{min-height:74px;resize:vertical}button{cursor:pointer}.primary{border-color:#2563eb;background:#2563eb;color:#fff}.danger{border-color:#fecaca;color:#b91c1c}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #e2e8f0;padding:9px 6px;text-align:left;vertical-align:top}th{color:#64748b;font-size:.72rem}td{font-size:.8rem}td small{display:block;margin-top:3px;color:#64748b}.pager{justify-content:flex-end;margin-top:14px;color:#64748b}.empty{text-align:center;color:#94a3b8}.tabs{display:flex;gap:6px;border-bottom:1px solid #e2e8f0;padding-bottom:10px}.tabs button{border-color:transparent;background:transparent;color:#64748b;font-weight:700;border-radius:7px}.tabs button.active{border-color:#2563eb;background:#eff6ff;color:#2563eb}.tab-panel{display:grid;gap:13px}@media(max-width:720px){.two,.editor-grid{grid-template-columns:1fr}.list-card{overflow:auto}}
 </style>

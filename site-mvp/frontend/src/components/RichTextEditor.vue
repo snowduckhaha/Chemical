@@ -21,6 +21,7 @@
       contenteditable="true"
       role="textbox"
       aria-multiline="true"
+      :aria-label="ariaLabel || placeholder"
       :data-placeholder="placeholder"
       @input="emitValue"
       @keyup="updateActiveCell"
@@ -35,12 +36,13 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from "vue";
 
-const props = withDefaults(defineProps<{ modelValue: string; placeholder?: string }>(), {
+const props = withDefaults(defineProps<{ modelValue: string; placeholder?: string; ariaLabel?: string }>(), {
   placeholder: "请输入正文…"
 });
 const emit = defineEmits<{ "update:modelValue": [value: string] }>();
 const editor = ref<HTMLDivElement>();
 const activeCell = ref(false);
+let lastEmittedValue: string | undefined;
 
 const hasHtml = (value: string) => /<\/?[a-z][^>]*>/i.test(value);
 const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -57,7 +59,11 @@ const selectedCell = () => {
   return element?.closest("td, th") as HTMLTableCellElement | null;
 };
 const updateActiveCell = () => { activeCell.value = Boolean(selectedCell()); };
-const emitValue = () => { emit("update:modelValue", editor.value?.innerHTML || ""); updateActiveCell(); };
+const emitValue = () => {
+  lastEmittedValue = editor.value?.innerHTML || "";
+  emit("update:modelValue", lastEmittedValue);
+  updateActiveCell();
+};
 const focus = () => editor.value?.focus();
 
 const command = (name: string, value?: string) => {
@@ -129,6 +135,9 @@ const paste = (event: ClipboardEvent) => {
 };
 
 watch(() => props.modelValue, (value) => {
+  // A v-model echo must not replace the live DOM and reset the caret/IME selection.
+  if (value === lastEmittedValue) return;
+  lastEmittedValue = undefined;
   const next = editableHtml(value || "");
   if (editor.value && editor.value.innerHTML !== next) editor.value.innerHTML = next;
   if (next !== value) emit("update:modelValue", next);

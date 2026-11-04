@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="UTF-8"><title>News editor regression</title></head>
+<body><div id="app"></div><script type="module">
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import { createRouter, createMemoryHistory } from 'vue-router';
+import News from '../src/views/AdminNewsArticlesView.vue';
+const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:lang/admin/news/articles', component: News }] });
+await router.push('/zh/admin/news/articles');
+createApp(News).use(createPinia()).use(router).mount('#app');
+</script></body></html>
