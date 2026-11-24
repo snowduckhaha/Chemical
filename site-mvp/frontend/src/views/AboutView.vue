@@ -14,7 +14,7 @@
     <section class="profile-section section-shell">
       <div class="profile-grid">
         <div class="profile-media">
-          <img src="/about/company-facility.png" :alt="text.profileImageAlt" />
+          <img src="/about/new-facility.jpg" :alt="text.profileImageAlt" />
         </div>
         <div class="profile-copy-panel">
           <p class="section-kicker">{{ text.profileKicker }}</p>
