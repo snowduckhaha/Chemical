@@ -137,6 +137,13 @@
           <p>
             {{
               lang === "zh"
+                ? "公司地址: 深圳市龙华区观湖街道润城社区求知路8号B6栋B633"
+                : "Office Address: Room B633, Building B6, No.8 Qiuzhi Road, Runcheng Community, Guanhu Street, Longhua District, Shenzhen, China"
+            }}
+          </p>
+          <p>
+            {{
+              lang === "zh"
                 ? "工厂地址: 江西省宜春市袁州区工业大道67号"
                 : "Factory Address: No.67, Gongye Avenue, Yuanzhou District, Yichun City, Jiangxi Province, China"
             }}

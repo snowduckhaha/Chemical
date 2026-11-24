@@ -47,15 +47,26 @@ export function organizationSchema(lang: string): JsonLdNode {
     knowsAbout: zh
       ? ["氢氧化铝（ATH）", "覆铜板（CCL）", "无卤阻燃填料", "氧化铝粉末", "硅烷偶联剂"]
       : ["aluminum hydroxide (ATH)", "copper clad laminate (CCL)", "halogen-free flame retardant fillers", "alumina powder", "silane coupling agents"],
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: zh
-        ? "袁州区工业大道67号"
-        : "No.67, Gongye Avenue, Yuanzhou District",
-      addressLocality: zh ? "宜春市" : "Yichun",
-      addressRegion: zh ? "江西省" : "Jiangxi",
-      addressCountry: "CN"
-    }
+    address: [
+      {
+        "@type": "PostalAddress",
+        streetAddress: zh
+          ? "观湖街道润城社区求知路8号B6栋B633"
+          : "Room B633, Building B6, No.8 Qiuzhi Road, Runcheng Community, Guanhu Street",
+        addressLocality: zh ? "深圳市" : "Shenzhen",
+        addressRegion: zh ? "广东省" : "Guangdong",
+        addressCountry: "CN"
+      },
+      {
+        "@type": "PostalAddress",
+        streetAddress: zh
+          ? "袁州区工业大道67号"
+          : "No.67, Gongye Avenue, Yuanzhou District",
+        addressLocality: zh ? "宜春市" : "Yichun",
+        addressRegion: zh ? "江西省" : "Jiangxi",
+        addressCountry: "CN"
+      }
+    ]
   });
 }
 
