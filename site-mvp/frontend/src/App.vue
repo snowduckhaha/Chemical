@@ -167,7 +167,7 @@
       </div>
 
       <div class="footer-meta">
-        <span>{{ lang === "zh" ? "©2026 深圳市起点化工有限公司版权所有。" : "©2026 Shenzhen Origin Chemical Industry Co., Ltd. All rights reserved." }}</span>
+        <span>{{ lang === "zh" ? "©2026 深圳市起点化工有限公司版权所有。" : "©2026 Shenzhen Qidian Chemical Industry Co., Ltd. All rights reserved." }}</span>
         <span>{{ lang === "zh" ? "隐私协议" : "Privacy Agreement" }}</span>
       </div>
     </footer>

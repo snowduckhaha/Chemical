@@ -35,7 +35,7 @@ export function organizationSchema(lang: string): JsonLdNode {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": ORGANIZATION_ID,
-    name: zh ? "深圳市起点化工有限公司" : "Shenzhen Origin Chemical Industry Co., Ltd.",
+    name: zh ? "深圳市起点化工有限公司" : "Shenzhen Qidian Chemical Industry Co., Ltd.",
     url: siteOrigin,
     logo: absoluteUrl("/products/logo-symbol-footer.png"),
     email: "admin@origin-chemical.com",
