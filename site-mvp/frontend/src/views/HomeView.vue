@@ -928,7 +928,7 @@ const thumbStyle = (item: Category) => {
 .stat-list h4 { color: #30343a; font-size: 21px; font-weight: 500; }
 .stat-list p { margin-top: 11px; color: #777; font-size: 20px; line-height: 1.6667; }
 
-.project-cta { min-height: 231px; margin-bottom: 0; padding: 38px 30px; border: 0; background: linear-gradient(104deg, rgba(9, 82, 141, .96), rgba(24, 161, 222, .86)), url('/about/company-facility.png') center / cover; color: #fff; align-items: center; }
+.project-cta { min-height: 231px; margin-bottom: 0; padding: 38px 30px; border: 0; background: linear-gradient(104deg, rgba(9, 82, 141, .96), rgba(24, 161, 222, .86)), url('/about/new-facility.jpg') center / cover; color: #fff; align-items: center; }
 .project-cta .section-kicker { color: rgba(255, 255, 255, .74); }
 .project-cta h2 { font-size: 50px; line-height: 58.3333px; font-weight: 500; color: #fff; letter-spacing: .8px; }
 .project-cta p { max-width: 650px; color: rgba(255, 255, 255, .85); font-size: 20px; line-height: 31.1111px; letter-spacing: 1px; }

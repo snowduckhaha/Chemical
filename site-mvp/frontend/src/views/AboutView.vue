@@ -104,14 +104,14 @@ const text = computed(() => {
       breadcrumbHome: "Home",
       breadcrumbCurrent: "Company Profile",
       profileKicker: "INTRODUCTION",
-      profileImageAlt: "Origin Chemical factory and production environment",
+      profileImageAlt: "Origin Chemical production base in Jiangxi (Jiangxi Qise Electronic Materials)",
       profileTitle: "About Us",
       profileParagraphs: [
-        "Founded in January 2010, Shenzhen Origin Chemical Industry Co., Ltd. (registered as Shenzhen Qidian Chemical Industry Co., Ltd.) ranks among China's early professional manufacturers integrating independent R&D, mass production, and global sales of functional inorganic chemical raw materials for the electronics and new-material industries.",
-        "Our core team boasts profound industry experience, allowing us to accurately capture diverse technical requirements from downstream manufacturers and provide targeted material solutions. Through over 16 years of persistent technical iteration and product upgrading, we have built a diversified product lineup meeting top-tier international standards.",
-        "Our product range covers specialty aluminum hydroxide, high-purity silica powder, high-grade alumina, as well as a full series of silane coupling agents. These versatile materials are widely applied in copper-clad laminates, semiconductor packaging, flame-retardant plastics, ceramic manufacturing, and photovoltaic supporting sectors, serving multiple high-end industrial chains.",
-        "Equipped with complete automated production lines and professional laboratory testing equipment, we realize large-scale, standardized manufacturing and full-index quality monitoring for all raw materials. We can flexibly respond to bulk orders and customized material demands, maintaining continuous, on-time, stable supply to numerous domestic and overseas manufacturers, helping partners stabilize production schedules and cut overall purchasing costs.",
-        "Adhering to the core business philosophy of cooperation and win-win, we implement strict full-process quality inspection and offer complete pre-sales, technical consultation, and after-sales support. We keep deepening material innovation to serve global new-material manufacturers, and we sincerely invite worldwide partners to create long-term, mutually beneficial cooperation with us."
+        "Founded in January 2010, Shenzhen Qidian Chemical Co., Ltd. is one of China's early specialized suppliers of functional inorganic chemical materials, integrating independent research and development, industrial-scale manufacturing, and global sales. The company is dedicated to providing high-quality functional materials and technical solutions for the electronics, new energy, and advanced materials industries.",
+        "With integrated R&D, manufacturing, and sales capabilities, the company operates a well-established supply chain supported by its own production facilities. Jiangxi Qise Electronic Materials Co., Ltd. serves as a key manufacturing entity associated with Shenzhen Qidian Chemical Co., Ltd. Both companies share the same legal representative, forming a coordinated business structure that combines Shenzhen-based market operations with manufacturing facilities in Jiangxi Province, China. Through its own manufacturing operations, the company provides not only professional global sales and customer support but also direct production capabilities, quality control, and reliable long-term supply. This integrated approach enables the company to deliver consistent products and customized material solutions tailored to specific customer requirements.",
+        "Our main products include Aluminum Hydroxide (ATH) Powder, Alumina (Aluminum Oxide) Powder, Silica Powder, and Silane Coupling Agents. These materials are widely used in electronic packaging, thermal management materials, flame-retardant applications, composites, and other advanced manufacturing industries.",
+        "Backed by an experienced technical and management team, the company has a strong understanding of the diverse requirements of downstream manufacturers and is committed to providing application-oriented material solutions. Through 16 years of continuous technological development and product improvement, we have established a diversified product portfolio designed to meet international customer expectations for product quality, performance consistency, and supply reliability.",
+        "Guided by technological innovation, dependable quality, and a customer-focused philosophy, Shenzhen Qidian Chemical Co., Ltd. continues to leverage its integrated manufacturing and global supply capabilities to create long-term value for customers worldwide."
       ],
       capabilityTitle: "Material Capability For Stable Sourcing",
       capabilities: [
@@ -181,14 +181,14 @@ const text = computed(() => {
     breadcrumbHome: "首页",
     breadcrumbCurrent: "公司简介",
     profileKicker: "介绍",
-    profileImageAlt: "起点化工工厂与生产环境",
+    profileImageAlt: "起点化工江西生产基地（江西起色电子材料有限公司）",
     profileTitle: "关于我们",
     profileParagraphs: [
-      "深圳市起点化工有限公司成立于2010年1月，是中国较早集自主研发、规模化生产及全球销售于一体的功能性无机化工原料专业企业之一，服务于电子及新材料行业。",
-      "公司的核心团队拥有深厚的行业经验，能够准确把握下游制造商多样化的技术需求，并提供针对性的材料解决方案。经过16年持续的技术迭代与产品升级，公司已建立符合国际高端标准的多元化产品体系。",
-      "产品范围包括特种氢氧化铝、高纯硅微粉、高等级氧化铝以及全系列硅烷偶联剂。这些材料广泛应用于覆铜板、半导体封装、阻燃塑料、陶瓷制造及光伏配套等领域，服务多个高端产业链。",
-      "依托完整的自动化生产线和专业实验室检测设备，公司实现规模化、标准化制造，并对所有原材料开展全指标质量监控。公司能够灵活响应大批量订单及定制化材料需求，为众多国内外制造商持续提供准时、稳定的供应，帮助合作伙伴稳定生产计划并降低综合采购成本。",
-      "公司秉承“合作共赢”的核心经营理念，实施严格的全流程质量检验，并提供完整的售前支持、技术咨询和售后服务。我们持续深化材料创新，服务全球新材料制造商，并诚邀全球合作伙伴与我们建立长期互利的合作关系。"
+      "深圳市起点化工有限公司成立于2010年1月，是中国较早集自主研发、规模化生产及全球销售于一体的功能性无机化工原料专业企业之一，致力于为电子、新能源及先进材料行业提供高品质的功能性材料与专业技术解决方案。",
+      "公司集研发、生产与销售于一体，拥有完善的供应链体系及自主生产能力。江西起色电子材料有限公司是深圳市起点化工有限公司的重要生产实体，两家公司由同一法定代表人负责，形成了深圳市场运营与江西工厂生产相结合的协同发展模式。依托江西自有生产工厂，公司不仅具备专业的全球销售与客户服务能力，还拥有自主生产、产品质量控制及持续供货能力，能够根据客户需求提供稳定可靠的产品与定制化材料解决方案。",
+      "公司主营产品包括氢氧化铝粉末、氧化铝粉末、硅微粉及硅烷偶联剂等功能性化工材料，广泛应用于电子封装、导热材料、阻燃材料、复合材料及其他先进制造领域。",
+      "公司的核心团队拥有深厚的行业经验，能够准确把握下游制造商多样化的技术需求，并提供针对性的材料解决方案。经过16年持续的技术迭代与产品升级，公司已逐步建立多元化的产品体系，致力于满足国内外客户对产品品质、性能一致性及供应稳定性的要求。",
+      "秉承技术创新、品质可靠与客户导向的经营理念，深圳市起点化工有限公司将持续发挥自主制造与全球供应的综合优势，为全球客户创造长期价值。"
     ],
     capabilityTitle: "稳定采购所需的材料能力",
     capabilities: [
